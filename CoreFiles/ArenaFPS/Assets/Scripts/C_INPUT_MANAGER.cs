@@ -17,7 +17,12 @@ public struct PlayerInput
     private bool _b_DPad_UpPressed;
     private bool _b_DPad_DownPressed;
     private Vector2 _v2_DPad;
+    private ButtonState _d_Button_A;
+    private bool _d_Button_B;
+    private bool _d_Button_X;
+    private bool _d_Button_Y;
 
+    // Analog Sticks
     public float zDir
     {
         internal set
@@ -76,6 +81,7 @@ public struct PlayerInput
         get { return _f_LookVert; }
     }
 
+    // DPad
     public bool DPad_Pressed_Left
     {
         set { _b_DPad_LeftPressed = value; }
@@ -103,6 +109,13 @@ public struct PlayerInput
         get { return _v2_DPad; }
     }
 
+    // A/B/X/Y
+    public ButtonState Button_A
+    {
+        internal set { _d_Button_A = value; }
+        get { return _d_Button_A; }
+    }
+
     public bool JumpPressed
     {
         set { _b_JumpPressed = value; }
@@ -126,7 +139,7 @@ public class C_INPUT_MANAGER : MonoBehaviour
     internal PlayerInput playerInput;
 
     // Use this for initialization
-    void Start ()
+    internal virtual void Start ()
     {
         playerInput = new PlayerInput();
 
@@ -209,14 +222,20 @@ public class C_INPUT_MANAGER : MonoBehaviour
         v2_DPad_Old = v2_DPad;
         #endregion
 
+        #region A/B/X/Y
+        playerInput.Button_A = ButtonState.Released;
+        if(player_State.Buttons.A == ButtonState.Pressed)
+        {
+            playerInput.Button_A = ButtonState.Pressed;
+        }
+        #endregion
+
         player_PrevState = player_State;
     }
 	
 	// Update is called once per frame
-	void Update ()
+	internal virtual void Update ()
     {
         UpdatePlayerInput();
-
-        print(playerInput.DPadVector);
     }
 }
