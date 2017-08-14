@@ -18,9 +18,9 @@ public struct PlayerInput
     private bool _b_DPad_DownPressed;
     private Vector2 _v2_DPad;
     private ButtonState _d_Button_A;
-    private bool _d_Button_B;
-    private bool _d_Button_X;
-    private bool _d_Button_Y;
+    private ButtonState _d_Button_B;
+    private ButtonState _d_Button_X;
+    private ButtonState _d_Button_Y;
 
     // Analog Sticks
     public float zDir
@@ -115,16 +115,43 @@ public struct PlayerInput
         internal set { _d_Button_A = value; }
         get { return _d_Button_A; }
     }
-
-    public bool JumpPressed
+    public ButtonState Button_B
     {
-        set { _b_JumpPressed = value; }
-        get { return _b_JumpPressed; }
+        internal set { _d_Button_B = value; }
+        get { return _d_Button_B; }
     }
-    public bool JumpHeld
+    public ButtonState Button_X
     {
-        set { _b_JumpHeld = value; }
-        get { return _b_JumpHeld; }
+        internal set { _d_Button_X = value; }
+        get { return _d_Button_X; }
+    }
+    public ButtonState Button_Y
+    {
+        internal set { _d_Button_Y = value; }
+        get { return _d_Button_Y; }
+    }
+
+    // Bumpers
+    public ButtonState Bumper_Left
+    {
+        internal set;
+        get;
+    }
+    public ButtonState Bumper_Right
+    {
+        internal set;
+        get;
+    }
+    
+    public ButtonState Trigger_Left
+    {
+        internal set;
+        get;
+    }
+    public ButtonState Trigger_Right
+    {
+        internal set;
+        get;
     }
 }
 
