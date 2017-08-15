@@ -180,7 +180,7 @@ public class C_INPUT_MANAGER : MonoBehaviour
         set { player = value; }
     }
 
-    float f_InputMinimum = 0.05f;
+    float f_InputMinimum = 0.01f;
     Vector2 v2_DPad;
     Vector2 v2_DPad_Old;
     void UpdatePlayerInput()

@@ -8,13 +8,14 @@ public class C_PlayerController : C_INPUT_MANAGER
     GameObject this_GameObject;
     Rigidbody this_RigidBody;
     GameObject this_CameraObject;
-    Camera this_Camera;
-    GameObject this_RaycastPoint;
 
     // Character Movement
     [SerializeField] float f_MaxSpeed = 5.0f;
     [SerializeField] float f_CameraRot = 3.0f;
     [SerializeField] bool b_InvertedCamera = false;
+
+    // Various information
+    float f_RaycastPoint_yPos;
 
 	// Use this for initialization
 	new void Start ()
@@ -23,18 +24,70 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_GameObject = gameObject;
         this_RigidBody = this_GameObject.GetComponent<Rigidbody>();
         this_CameraObject = this_GameObject.transform.Find("Camera").gameObject;
-        this_Camera = this_CameraObject.GetComponent<Camera>();
-        this_RaycastPoint = this_GameObject.transform.Find("RaycastPoint").gameObject;
+
+        // Raycast Connections
+        RaycastPoints[0] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_0").gameObject;
+        RaycastPoints[1] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_1").gameObject;
+        RaycastPoints[2] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_2").gameObject;
+        RaycastPoints[3] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_3").gameObject;
+        RaycastPoints[4] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_4").gameObject;
 
         base.Start();
 	}
 
-    float f_VertAngle;
+    Vector3 v3_PlayerVelocity_Old;
+    Vector3 v3_HorizRot_Old;
+    bool b_TouchingGround;
     void PlayerInput()
     {
         // Capture player gravity velocity
         float f_yVel_ = this_RigidBody.velocity.y;
+        
+        // Convert left Stick into velocity
+        Vector3 v3_PlayerVelocity_ = this_GameObject.transform.rotation * new Vector3(playerInput.xDir, 0, playerInput.zDir) * f_MaxSpeed;
 
+        // Determine if touching ground
+        RaycastHit hit_;
+        b_TouchingGround = RaycastToGround(out hit_);
+        if (b_TouchingGround && f_JumpTimer == 0f)
+        {
+            // Convert to ground normal
+            v3_PlayerVelocity_ = Vector3.ProjectOnPlane(v3_PlayerVelocity_, -hit_.normal);
+
+            // Move player to be on the ground
+            Vector3 v3_NewPos_ = hit_.point;
+            v3_NewPos_.y += 1f;
+            this_RigidBody.transform.position = v3_NewPos_;
+
+            // Reset y Velocity
+            f_yVel_ = 0f;
+            v3_PlayerVelocity_Old.y = 0f;
+
+            // Reset timer
+            f_JumpTimer = f_JumpTimer_Max;
+        }
+        else // Not touching the ground
+        {
+            f_yVel_ -= 50f * Time.deltaTime;
+        }
+        
+        // Reapply y Velocity (gravity)
+        v3_PlayerVelocity_.y = f_yVel_;
+
+        // Lerp old player speed into new player speed
+        v3_PlayerVelocity_ = Vector3.Lerp(v3_PlayerVelocity_Old, v3_PlayerVelocity_, 0.25f);
+        
+        // Input velocity to player object
+        this_RigidBody.velocity = v3_PlayerVelocity_;
+
+        // Store old velocity for reference
+        v3_PlayerVelocity_Old = v3_PlayerVelocity_;
+    }
+
+    float f_VertAngle;
+    float f_VertAngle_Old;
+    void CameraInput()
+    {
         // Rotate player based on Right Stick
         Vector3 v3_PlayerRot = this_GameObject.transform.eulerAngles;
         Vector3 v3_NewRot = v3_PlayerRot;
@@ -43,42 +96,69 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_GameObject.transform.eulerAngles = v3_NewRot;
 
         // Rotate camera based on Right Stick
-        f_VertAngle -= playerInput.LookVert;
+        if (b_InvertedCamera) playerInput.LookVert *= -1f;
+        f_VertAngle -= playerInput.LookVert * f_CameraRot;
         f_VertAngle = Mathf.Clamp(f_VertAngle, -89f, 89f);
+        f_VertAngle_Old = f_VertAngle;
 
         Vector3 v3_CamEuler = this_CameraObject.transform.eulerAngles;
         v3_CamEuler.x = f_VertAngle;
         this_CameraObject.transform.eulerAngles = v3_CamEuler;
-
-        // Convert left Stick into velocity
-        Vector3 v3_NewVel_ = this_GameObject.transform.rotation * new Vector3(playerInput.xDir, 0, playerInput.zDir) * f_MaxSpeed;
-        v3_NewVel_.y = f_yVel_;
-        this_RigidBody.velocity = v3_NewVel_;
-        
     }
 
-    bool b_IsTouchingGround;
-    void RaycastToGround()
+    GameObject[] RaycastPoints = new GameObject[5];
+    bool RaycastToGround(out RaycastHit hit_)
     {
-        RaycastHit hit_;
+        // Reset values
+        hit_ = new RaycastHit();
+        bool b_HitGround_ = false;
         int i_LayerMask_ = LayerMask.GetMask("Ground");
-        float f_DistToGround_ = 0.05f;
-        b_IsTouchingGround = false;
+        float f_DistToGround_ = 0.1f;
 
-        if(Physics.Raycast(this_RaycastPoint.transform.position, Vector3.down, out hit_, f_DistToGround_, i_LayerMask_))
+        // If the player is close enough to touching the ground, report it
+        if(Physics.Raycast(RaycastPoints[0].transform.position, Vector3.down, out hit_, f_DistToGround_, i_LayerMask_))
         {
-            b_IsTouchingGround = true;
+            b_HitGround_ = true;
         }
 
-        print("Touching Ground: " + b_IsTouchingGround);
+        // Apply natural gravity (although we're messing with it) if touching the ground
+        this_RigidBody.useGravity = !b_HitGround_;
 
-        this_RigidBody.useGravity = !b_IsTouchingGround;
+        // Return values
+        return b_HitGround_;
     }
 
+    float f_JumpTimer = 0f;
+    static float f_JumpTimer_Max = 0.1f; // Consider making this the time for the JumpJet to 'refuel'
     private void FixedUpdate()
     {
+        // Reduce jump timer
+        if(f_JumpTimer > 0f)
+        {
+            f_JumpTimer -= Time.fixedDeltaTime;
+            if (f_JumpTimer < 0f) f_JumpTimer = 0f;
+        }
+
+        if (playerInput.Button_A == XInputDotNetPure.ButtonState.Pressed)
+        {
+            if(b_TouchingGround)
+            {
+                // Set jump state
+                b_TouchingGround = false;
+
+                Vector3 v3_Velocity_ = this_RigidBody.velocity;
+                v3_Velocity_.y = 25f;
+                this_RigidBody.velocity = v3_Velocity_;
+            }
+        }
+
         PlayerInput();
-        RaycastToGround();
+        CameraInput();
+    }
+
+    private void LateUpdate()
+    {
+        
     }
 
     // Update is called once per frame
