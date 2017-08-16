@@ -13,6 +13,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     [SerializeField] float f_MaxSpeed = 5.0f;
     [SerializeField] float f_CameraRot = 3.0f;
     [SerializeField] bool b_InvertedCamera = false;
+    [SerializeField] float f_AirControlPercentage = 0.25f;
 
     // Various information
     float f_RaycastPoint_yPos;
@@ -35,6 +36,19 @@ public class C_PlayerController : C_INPUT_MANAGER
         base.Start();
 	}
 
+    Vector3 JumpVelocity()
+    {
+        // Set jump state
+        b_TouchingGround = false;
+
+        Vector3 v3_Velocity_ = this_RigidBody.velocity;
+        v3_Velocity_.y = 10f;
+
+        f_JumpTimer = f_JumpTimer_Max;
+
+        return v3_Velocity_;
+    }
+
     Vector3 v3_PlayerVelocity_Old;
     Vector3 v3_HorizRot_Old;
     bool b_TouchingGround;
@@ -42,14 +56,18 @@ public class C_PlayerController : C_INPUT_MANAGER
     {
         // Capture player gravity velocity
         float f_yVel_ = this_RigidBody.velocity.y;
-        
+
         // Convert left Stick into velocity
-        Vector3 v3_PlayerVelocity_ = this_GameObject.transform.rotation * new Vector3(playerInput.xDir, 0, playerInput.zDir) * f_MaxSpeed;
+        Vector3 v3_PlayerVelocity_ = new Vector3();
+        Vector3 v3_InputVelocity_ = this_GameObject.transform.rotation * new Vector3(playerInput.xDir, 0, playerInput.zDir) * f_MaxSpeed;
+
+        if (b_TouchingGround) v3_PlayerVelocity_ = v3_InputVelocity_;
+        else v3_PlayerVelocity_ = this_RigidBody.velocity + (v3_InputVelocity_ * f_AirControlPercentage);
 
         // Determine if touching ground
         RaycastHit hit_;
         b_TouchingGround = RaycastToGround(out hit_);
-        if (b_TouchingGround && f_JumpTimer == 0f)
+        if (b_TouchingGround)
         {
             // Convert to ground normal
             v3_PlayerVelocity_ = Vector3.ProjectOnPlane(v3_PlayerVelocity_, -hit_.normal);
@@ -62,20 +80,31 @@ public class C_PlayerController : C_INPUT_MANAGER
             // Reset y Velocity
             f_yVel_ = 0f;
             v3_PlayerVelocity_Old.y = 0f;
-
-            // Reset timer
-            f_JumpTimer = f_JumpTimer_Max;
         }
         else // Not touching the ground
         {
             f_yVel_ -= 50f * Time.deltaTime;
         }
-        
+
+        // If the player is moving faster than the maximum speed possible, cap it
+        float f_CurrSpeed_ = v3_PlayerVelocity_.magnitude;
+        if(f_CurrSpeed_ > f_MaxSpeed)
+        {
+            v3_PlayerVelocity_.Normalize();
+            v3_PlayerVelocity_ *= f_MaxSpeed;
+        }
+
         // Reapply y Velocity (gravity)
         v3_PlayerVelocity_.y = f_yVel_;
 
         // Lerp old player speed into new player speed
         v3_PlayerVelocity_ = Vector3.Lerp(v3_PlayerVelocity_Old, v3_PlayerVelocity_, 0.25f);
+
+        // If the player has pressed A and we're allowed to jump, jump
+        if (playerInput.Button_A == XInputDotNetPure.ButtonState.Pressed && f_JumpTimer == 0f && b_TouchingGround)
+        {
+            v3_PlayerVelocity_ = JumpVelocity();
+        }
         
         // Input velocity to player object
         this_RigidBody.velocity = v3_PlayerVelocity_;
@@ -113,7 +142,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         hit_ = new RaycastHit();
         bool b_HitGround_ = false;
         int i_LayerMask_ = LayerMask.GetMask("Ground");
-        float f_DistToGround_ = 0.1f;
+        float f_DistToGround_ = 0.06f;
 
         // If the player is close enough to touching the ground, report it
         if(Physics.Raycast(RaycastPoints[0].transform.position, Vector3.down, out hit_, f_DistToGround_, i_LayerMask_))
@@ -128,37 +157,20 @@ public class C_PlayerController : C_INPUT_MANAGER
         return b_HitGround_;
     }
 
-    float f_JumpTimer = 0f;
-    static float f_JumpTimer_Max = 0.1f; // Consider making this the time for the JumpJet to 'refuel'
+    float f_JumpTimer = 0.1f;
+    static float f_JumpTimer_Max = 1.0f; // Consider making this the time for the JumpJet to 'refuel'
     private void FixedUpdate()
     {
         // Reduce jump timer
-        if(f_JumpTimer > 0f)
+        if (f_JumpTimer > 0f)
         {
             f_JumpTimer -= Time.fixedDeltaTime;
-            if (f_JumpTimer < 0f) f_JumpTimer = 0f;
+            if (f_JumpTimer <= 0f) f_JumpTimer = 0f;
         }
-
-        if (playerInput.Button_A == XInputDotNetPure.ButtonState.Pressed)
-        {
-            if(b_TouchingGround)
-            {
-                // Set jump state
-                b_TouchingGround = false;
-
-                Vector3 v3_Velocity_ = this_RigidBody.velocity;
-                v3_Velocity_.y = 25f;
-                this_RigidBody.velocity = v3_Velocity_;
-            }
-        }
-
-        PlayerInput();
-        CameraInput();
-    }
-
-    private void LateUpdate()
-    {
         
+        PlayerInput();
+
+        CameraInput();
     }
 
     // Update is called once per frame
