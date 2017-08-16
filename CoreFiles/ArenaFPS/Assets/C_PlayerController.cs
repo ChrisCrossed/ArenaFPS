@@ -105,7 +105,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         {
             v3_PlayerVelocity_ = JumpVelocity();
         }
-        
+
         // Input velocity to player object
         this_RigidBody.velocity = v3_PlayerVelocity_;
 
@@ -142,7 +142,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         hit_ = new RaycastHit();
         bool b_HitGround_ = false;
         int i_LayerMask_ = LayerMask.GetMask("Ground");
-        float f_DistToGround_ = 0.06f;
+        float f_DistToGround_ = 0.1f;
 
         // If the player is close enough to touching the ground, report it
         if(Physics.Raycast(RaycastPoints[0].transform.position, Vector3.down, out hit_, f_DistToGround_, i_LayerMask_))
@@ -158,7 +158,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     }
 
     float f_JumpTimer = 0.1f;
-    static float f_JumpTimer_Max = 1.0f; // Consider making this the time for the JumpJet to 'refuel'
+    static float f_JumpTimer_Max = 5.0f; // Consider making this the time for the JumpJet to 'refuel'
     private void FixedUpdate()
     {
         // Reduce jump timer
