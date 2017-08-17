@@ -8,6 +8,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     GameObject this_GameObject;
     Rigidbody this_RigidBody;
     GameObject this_CameraObject;
+    GameObject[] this_WallrunCollider = new GameObject[2];
 
     // Character Movement
     [SerializeField] float f_MaxSpeed = 5.0f;
@@ -25,6 +26,10 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_GameObject = gameObject;
         this_RigidBody = this_GameObject.GetComponent<Rigidbody>();
         this_CameraObject = this_GameObject.transform.Find("Camera").gameObject;
+        this_WallrunCollider[0] = this_GameObject.transform.Find("WallrunCollider_Top").gameObject;
+        this_WallrunCollider[1] = this_GameObject.transform.Find("WallrunCollider_Bottom").gameObject;
+        colliderBot = this_WallrunCollider[0].GetComponent<C_WallrunColliderLogic>();
+        colliderTop = this_WallrunCollider[1].GetComponent<C_WallrunColliderLogic>();
 
         // Raycast Connections
         RaycastPoints[0] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_0").gameObject;
@@ -69,9 +74,6 @@ public class C_PlayerController : C_INPUT_MANAGER
         b_TouchingGround = RaycastToGround(out hit_);
         if (b_TouchingGround)
         {
-            // Convert to ground normal
-            v3_PlayerVelocity_ = Vector3.ProjectOnPlane(v3_PlayerVelocity_, -hit_.normal);
-
             // Move player to be on the ground
             Vector3 v3_NewPos_ = hit_.point;
             v3_NewPos_.y += 1f;
@@ -83,7 +85,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         }
         else // Not touching the ground
         {
-            f_yVel_ -= 50f * Time.deltaTime;
+            f_yVel_ -= 65f * Time.deltaTime;
         }
 
         // If the player is moving faster than the maximum speed possible, cap it
@@ -95,11 +97,35 @@ public class C_PlayerController : C_INPUT_MANAGER
         }
 
         // Reapply y Velocity (gravity)
-        v3_PlayerVelocity_.y = f_yVel_;
+        if(!b_TouchingGround) v3_PlayerVelocity_.y = f_yVel_;
 
         // Lerp old player speed into new player speed
         v3_PlayerVelocity_ = Vector3.Lerp(v3_PlayerVelocity_Old, v3_PlayerVelocity_, 0.25f);
 
+        PhysicMaterial physMat_ = this_GameObject.GetComponent<CapsuleCollider>().material;
+        physMat_.dynamicFriction = 0f;
+        physMat_.frictionCombine = PhysicMaterialCombine.Minimum;
+        physMat_.staticFriction = 0f;
+        
+        if (b_TouchingGround)
+        {
+            if(playerInput.xDir == 0f && playerInput.zDir == 0f)
+            {
+                physMat_.dynamicFriction = 1f;
+                physMat_.frictionCombine = PhysicMaterialCombine.Maximum;
+                physMat_.staticFriction = 1f;
+                this_GameObject.GetComponent<CapsuleCollider>().material = physMat_;
+            }
+        }
+
+        this_GameObject.GetComponent<CapsuleCollider>().material = physMat_;
+
+        // Convert to ground normal
+        v3_PlayerVelocity_ = Vector3.ProjectOnPlane(v3_PlayerVelocity_, -hit_.normal);
+
+        GameObject go_DebugPoint = transform.Find("DebugPoint").gameObject;
+        // Debug.DrawRay(go_DebugPoint.transform.position, -hit_.normal, Color.red);
+        
         // If the player has pressed A and we're allowed to jump, jump
         if (playerInput.Button_A == XInputDotNetPure.ButtonState.Pressed && f_JumpTimer == 0f && b_TouchingGround)
         {
@@ -135,6 +161,41 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_CameraObject.transform.eulerAngles = v3_CamEuler;
     }
 
+    C_WallrunColliderLogic colliderBot;
+    C_WallrunColliderLogic colliderTop;
+    void CaptureWallrunColliders()
+    {
+        // If top and bottom colliders are touching the same wallrun, override velocity
+        GameObject go_Top = colliderTop.WallrunCollider;
+        GameObject go_Bot = colliderBot.WallrunCollider;
+
+        if (go_Top == null) return;
+        if (go_Bot == null) return;
+
+        if(go_Bot == go_Top)
+        {
+            Vector3 v3_Velocity = this_RigidBody.velocity;
+            v3_Velocity.y = 0f;
+
+            // Determine vector toward wall
+            Vector3 v3_WallVector = new Vector3(colliderTop.ClosestContactPoint.x, this_GameObject.transform.position.y, colliderTop.ClosestContactPoint.z);
+            v3_WallVector = v3_WallVector - this_GameObject.transform.position;
+            v3_WallVector.Normalize();
+
+            RaycastHit wallhit_;
+            Physics.Raycast(this_GameObject.transform.position, v3_WallVector, out wallhit_, 0.5f, LayerMask.NameToLayer("Wallrun"));
+
+            v3_WallVector = Vector3.ProjectOnPlane(v3_Velocity, -wallhit_.normal);
+            v3_WallVector.Normalize();
+            v3_WallVector *= f_MaxSpeed;
+
+            // GameObject go_DebugPoint = transform.Find("DebugPoint").gameObject;
+            // Debug.DrawRay(go_DebugPoint.transform.position, v3_WallVector, Color.red);
+
+            this_RigidBody.velocity = v3_WallVector;
+        }
+    }
+
     GameObject[] RaycastPoints = new GameObject[5];
     bool RaycastToGround(out RaycastHit hit_)
     {
@@ -142,7 +203,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         hit_ = new RaycastHit();
         bool b_HitGround_ = false;
         int i_LayerMask_ = LayerMask.GetMask("Ground");
-        float f_DistToGround_ = 0.1f;
+        float f_DistToGround_ = 0.151f;
 
         // If the player is close enough to touching the ground, report it
         if(Physics.Raycast(RaycastPoints[0].transform.position, Vector3.down, out hit_, f_DistToGround_, i_LayerMask_))
@@ -151,14 +212,15 @@ public class C_PlayerController : C_INPUT_MANAGER
         }
 
         // Apply natural gravity (although we're messing with it) if touching the ground
-        this_RigidBody.useGravity = !b_HitGround_;
+        // this_RigidBody.useGravity = !b_HitGround_;
+        this_RigidBody.useGravity = false;
 
         // Return values
         return b_HitGround_;
     }
 
     float f_JumpTimer = 0.1f;
-    static float f_JumpTimer_Max = 5.0f; // Consider making this the time for the JumpJet to 'refuel'
+    static float f_JumpTimer_Max = 1.0f; // (5.0) Consider making this the time for the JumpJet to 'refuel'
     private void FixedUpdate()
     {
         // Reduce jump timer
@@ -169,6 +231,11 @@ public class C_PlayerController : C_INPUT_MANAGER
         }
         
         PlayerInput();
+
+        if(playerInput.Trigger_Left == XInputDotNetPure.ButtonState.Pressed && !b_TouchingGround)
+        {
+            CaptureWallrunColliders();
+        }
 
         CameraInput();
     }

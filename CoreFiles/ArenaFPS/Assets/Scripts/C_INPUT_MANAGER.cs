@@ -257,6 +257,14 @@ public class C_INPUT_MANAGER : MonoBehaviour
         }
         #endregion
 
+        #region Trigger Input
+        if (player_State.Triggers.Left > 0.4f) playerInput.Trigger_Left = ButtonState.Pressed;
+        else playerInput.Trigger_Left = ButtonState.Released;
+
+        if (player_State.Triggers.Right > 0.4f) playerInput.Trigger_Right = ButtonState.Pressed;
+        else playerInput.Trigger_Right = ButtonState.Released;
+        #endregion
+
         player_PrevState = player_State;
     }
 	
