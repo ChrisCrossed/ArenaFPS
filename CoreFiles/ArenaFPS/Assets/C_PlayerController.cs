@@ -15,9 +15,12 @@ public class C_PlayerController : C_INPUT_MANAGER
     [SerializeField] float f_CameraRot = 3.0f;
     [SerializeField] bool b_InvertedCamera = false;
     [SerializeField] float f_AirControlPercentage = 0.25f;
-
+    
     // Various information
     float f_RaycastPoint_yPos;
+
+    // Objective Control
+    bool b_HasObjective;
 
 	// Use this for initialization
 	new void Start ()
@@ -38,8 +41,28 @@ public class C_PlayerController : C_INPUT_MANAGER
         RaycastPoints[3] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_3").gameObject;
         RaycastPoints[4] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_4").gameObject;
 
+        // Objective Models
+        BallModel = transform.Find("BallModel");
+
+        HasObjective = false;
+
         base.Start();
 	}
+
+    Transform BallModel;
+    public bool HasObjective
+    {
+        set
+        {
+            b_HasObjective = value;
+
+            if(BallModel)
+            {
+                BallModel.GetComponent<C_BallModel>().SetActive( b_HasObjective );
+            }
+        }
+        get { return b_HasObjective; }
+    }
 
     Vector3 JumpVelocity()
     {
@@ -189,9 +212,6 @@ public class C_PlayerController : C_INPUT_MANAGER
             v3_WallVector.Normalize();
             v3_WallVector *= f_MaxSpeed;
 
-            // GameObject go_DebugPoint = transform.Find("DebugPoint").gameObject;
-            // Debug.DrawRay(go_DebugPoint.transform.position, v3_WallVector, Color.red);
-
             this_RigidBody.velocity = v3_WallVector;
         }
     }
@@ -244,5 +264,8 @@ public class C_PlayerController : C_INPUT_MANAGER
     new void Update ()
     {
         base.Update();
+
+        if (Input.GetKeyDown(KeyCode.Escape) || playerInput.Button_Start == XInputDotNetPure.ButtonState.Pressed)
+            Application.Quit();
     }
 }

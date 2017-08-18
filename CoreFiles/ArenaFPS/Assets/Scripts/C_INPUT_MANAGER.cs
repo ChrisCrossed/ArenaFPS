@@ -21,6 +21,8 @@ public struct PlayerInput
     private ButtonState _d_Button_B;
     private ButtonState _d_Button_X;
     private ButtonState _d_Button_Y;
+    private ButtonState _Start;
+    private ButtonState _Select;
 
     // Analog Sticks
     public float zDir
@@ -153,6 +155,18 @@ public struct PlayerInput
         internal set;
         get;
     }
+
+    // Start & Select
+    public ButtonState Button_Start
+    {
+        set { _Start = value; }
+        internal get { return _Start; }
+    }
+    public ButtonState Button_Select
+    {
+        set { _Select = value; }
+        get { return _Select; }
+    }
 }
 
 public class C_INPUT_MANAGER : MonoBehaviour
@@ -263,6 +277,14 @@ public class C_INPUT_MANAGER : MonoBehaviour
 
         if (player_State.Triggers.Right > 0.4f) playerInput.Trigger_Right = ButtonState.Pressed;
         else playerInput.Trigger_Right = ButtonState.Released;
+        #endregion
+
+        #region Start & Select
+        if (player_State.Buttons.Start == ButtonState.Pressed) playerInput.Button_Start = ButtonState.Pressed;
+        else playerInput.Button_Start = ButtonState.Released;
+
+        if (player_State.Buttons.Back == ButtonState.Pressed) playerInput.Button_Select = ButtonState.Pressed;
+        else playerInput.Button_Select = ButtonState.Released;
         #endregion
 
         player_PrevState = player_State;
