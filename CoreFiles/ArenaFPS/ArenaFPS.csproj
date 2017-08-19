@@ -99,8 +99,12 @@
     <Compile Include="Assets\C_BallLogic.cs" />
     <Compile Include="Assets\C_BallModel.cs" />
     <Compile Include="Assets\C_BallMovement.cs" />
+    <Compile Include="Assets\C_GoalGuide.cs" />
+    <Compile Include="Assets\C_GoalLogic.cs" />
+    <Compile Include="Assets\C_GoalTrigger.cs" />
     <Compile Include="Assets\C_PlayerController.cs" />
     <Compile Include="Assets\C_RotatingPieceLogic.cs" />
+    <Compile Include="Assets\C_SystemManager.cs" />
     <Compile Include="Assets\C_WallrunColliderLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />

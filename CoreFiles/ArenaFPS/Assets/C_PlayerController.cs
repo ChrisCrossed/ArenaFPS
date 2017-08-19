@@ -22,6 +22,8 @@ public class C_PlayerController : C_INPUT_MANAGER
     // Objective Control
     bool b_HasObjective;
 
+    [SerializeField] TeamColor teamColor = TeamColor.Red;
+
 	// Use this for initialization
 	new void Start ()
     {
@@ -46,8 +48,23 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         HasObjective = false;
 
+        // Set Layer according to team
+        TeamColor = teamColor;
+
         base.Start();
 	}
+
+    public TeamColor TeamColor
+    {
+        get { return teamColor; }
+        set
+        {
+            teamColor = value;
+
+            gameObject.layer = LayerMask.NameToLayer("PlayerRed");
+            if (teamColor == TeamColor.Blue) gameObject.layer = LayerMask.NameToLayer("PlayerBlue");
+        }
+    }
 
     Transform BallModel;
     public bool HasObjective

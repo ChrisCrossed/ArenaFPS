@@ -16,11 +16,11 @@ TagManager:
   - Ground
   - Player
   - Wallrun
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ball
+  - BlockerRed
+  - PlayerRed
+  - PlayerBlue
+  - BlockerBlue
   - 
   - 
   - 

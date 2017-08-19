@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class C_BallLogic : MonoBehaviour
 {
-    int i_LayerMask;
+    int i_LayerMask_Red;
+    int i_LayerMask_Blue;
 
     // Model
     GameObject go_Model;
@@ -17,7 +18,8 @@ public class C_BallLogic : MonoBehaviour
 	void Start ()
     {
         // Player layer mask
-        i_LayerMask = LayerMask.NameToLayer("Player");
+        i_LayerMask_Red = LayerMask.NameToLayer("PlayerRed");
+        i_LayerMask_Blue = LayerMask.NameToLayer("PlayerBlue");
 
         go_Model = transform.Find("Model").gameObject;
         this_MeshRenderer = go_Model.GetComponent<MeshRenderer>();
@@ -27,7 +29,7 @@ public class C_BallLogic : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider_)
     {
-        if(collider_.gameObject.layer == i_LayerMask)
+        if(collider_.gameObject.layer == i_LayerMask_Red || collider_.gameObject.layer == i_LayerMask_Blue)
         {
             // Tell the player that touched it they 'own the ball'
             collider_.gameObject.GetComponent<C_PlayerController>().HasObjective = true;
@@ -38,7 +40,7 @@ public class C_BallLogic : MonoBehaviour
     }
 
     bool b_IsActive;
-    bool IsActive
+    public bool IsActive
     {
         set
         {
