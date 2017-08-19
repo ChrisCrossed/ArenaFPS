@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ProBuilder2.Common;
 
 public enum TeamColor
 {
@@ -21,10 +22,14 @@ public class C_GoalLogic : MonoBehaviour
     C_BallLogic BallLogic;
     GameObject playerBlocker;
 
+    // Material Connections
+    [SerializeField] Material BlueTeamMaterial;
+    [SerializeField] Material RedTeamMaterial;
+
     // Receive Values for Entry Goal vs. Shot Goal
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         if(GameObject.Find("SystemManager"))
         {
@@ -46,6 +51,16 @@ public class C_GoalLogic : MonoBehaviour
             playerBlocker.layer = LayerMask.NameToLayer("BlockerRed");
             if (GoalColor == TeamColor.Blue) playerBlocker.layer = LayerMask.NameToLayer("BlockerBlue");
         }
+
+        // Set goal color
+        Material GoalMaterial = RedTeamMaterial;
+        if (GoalColor == TeamColor.Blue) GoalMaterial = BlueTeamMaterial;
+
+        // http://www.procore3d.com/forum/topic/1315-switch-probuilder-material-at-runtime/
+        pb_Object object_ = GetComponent<pb_Object>();
+        object_.SetFaceMaterial(object_.faces, GoalMaterial);
+        object_.ToMesh();
+        object_.Refresh();
     }
 
     public TeamColor GetGoalColor

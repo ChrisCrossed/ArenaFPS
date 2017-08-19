@@ -112,9 +112,13 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
+6c4a9f34076d62a5d9f0304dab47906b Assembly-CSharp.dll:.C_SystemManager
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_BallLogic
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_GoalGuide
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:ProBuilder2.Examples.HueCube
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_BallMovement
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_GoalTrigger
+5071afd83657eb70408486afbced723e Assembly-CSharp.dll:.C_GoalLogic
 a13e348db57cdb225ef648cd7f959981 ProBuilderCore-Unity5.dll:ProBuilder2.Common.pb_BezierShape
 d65f8e166eb4df1e46eb9eaa8ee261c1 ProBuilderCore-Unity5.dll:ProBuilder2.Common.pb_ColorPalette
 05524b8f659e7bfe5756d1335fec24ba ProBuilderCore-Unity5.dll:.pb_DummyScript
@@ -149,7 +153,7 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
-789a42b31ac51610f454252c2da90893 Assembly-CSharp.dll:.C_PlayerController
+8d6451ac28f90389d221fa6e5c0eaf15 Assembly-CSharp.dll:.C_PlayerController
 fd2a9c7bc371a109e82f458a25c73421 Assembly-CSharp.dll:.C_RotatingPieceLogic
 420d73cb5979b4d126f3c0d301bcca59 Assembly-CSharp.dll:ProBuilder2.Examples.CameraControls
 32dcc1dca94294515dfea07e896e1a84 Assembly-CSharp.dll:ProBuilder2.Examples.RuntimeEdit

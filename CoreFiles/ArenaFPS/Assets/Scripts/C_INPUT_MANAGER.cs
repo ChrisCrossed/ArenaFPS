@@ -175,7 +175,7 @@ public class C_INPUT_MANAGER : MonoBehaviour
     [SerializeField] internal PlayerIndex player = PlayerIndex.One;
     GamePadState player_State;
     GamePadState player_PrevState;
-
+    
     // PlayerInput struct
     internal PlayerInput playerInput;
 

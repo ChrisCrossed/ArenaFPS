@@ -61,8 +61,14 @@ public class C_PlayerController : C_INPUT_MANAGER
         {
             teamColor = value;
 
+            // Set layer
             gameObject.layer = LayerMask.NameToLayer("PlayerRed");
             if (teamColor == TeamColor.Blue) gameObject.layer = LayerMask.NameToLayer("PlayerBlue");
+
+            // Set player material
+            Color matColor = Color.red;
+            if (teamColor == TeamColor.Blue) matColor = Color.cyan;
+            gameObject.GetComponent<MeshRenderer>().material.color = matColor;
         }
     }
 
@@ -86,12 +92,36 @@ public class C_PlayerController : C_INPUT_MANAGER
         // Set jump state
         b_TouchingGround = false;
 
+        // Temporarily disable wallrun colliders
+        SetWallrunColliderState = false;
+        WallrunDisabledTimer = WallrunDisabledTimer_Max;
+        // colliderTop.WallrunCollider = null;
+
         Vector3 v3_Velocity_ = this_RigidBody.velocity;
         v3_Velocity_.y = 10f;
 
         f_JumpTimer = f_JumpTimer_Max;
 
         return v3_Velocity_;
+    }
+
+    float WallrunDisabledTimer = 0f;
+    static float WallrunDisabledTimer_Max = 0.1f;
+    bool SetWallrunColliderState
+    {
+        set
+        {
+            colliderTop.enabled = value;
+            colliderBot.enabled = value;
+        }
+        get
+        {
+            bool BothEnabled = false;
+
+            if (colliderTop.enabled && colliderBot.enabled) BothEnabled = true;
+
+            return BothEnabled;
+        }
     }
 
     Vector3 v3_PlayerVelocity_Old;
@@ -167,7 +197,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         // Debug.DrawRay(go_DebugPoint.transform.position, -hit_.normal, Color.red);
         
         // If the player has pressed A and we're allowed to jump, jump
-        if (playerInput.Button_A == XInputDotNetPure.ButtonState.Pressed && f_JumpTimer == 0f && b_TouchingGround)
+        if (playerInput.Button_A == XInputDotNetPure.ButtonState.Pressed && f_JumpTimer == 0f)
         {
             v3_PlayerVelocity_ = JumpVelocity();
         }
@@ -203,6 +233,7 @@ public class C_PlayerController : C_INPUT_MANAGER
 
     C_WallrunColliderLogic colliderBot;
     C_WallrunColliderLogic colliderTop;
+    bool b_IsWallrun;
     void CaptureWallrunColliders()
     {
         // If top and bottom colliders are touching the same wallrun, override velocity
@@ -212,8 +243,12 @@ public class C_PlayerController : C_INPUT_MANAGER
         if (go_Top == null) return;
         if (go_Bot == null) return;
 
+        b_IsWallrun = false;
+
         if(go_Bot == go_Top)
         {
+            b_IsWallrun = true;
+
             Vector3 v3_Velocity = this_RigidBody.velocity;
             v3_Velocity.y = 0f;
 
@@ -265,6 +300,17 @@ public class C_PlayerController : C_INPUT_MANAGER
         {
             f_JumpTimer -= Time.fixedDeltaTime;
             if (f_JumpTimer <= 0f) f_JumpTimer = 0f;
+        }
+
+        if (WallrunDisabledTimer > 0)
+        {
+            WallrunDisabledTimer -= Time.fixedDeltaTime;
+            if (WallrunDisabledTimer < 0)
+            {
+                WallrunDisabledTimer = 0f;
+
+                SetWallrunColliderState = true;
+            }
         }
         
         PlayerInput();
