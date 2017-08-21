@@ -197,7 +197,7 @@ public class C_INPUT_MANAGER : MonoBehaviour
     float f_InputMinimum = 0.01f;
     Vector2 v2_DPad;
     Vector2 v2_DPad_Old;
-    void UpdatePlayerInput()
+    internal virtual void UpdatePlayerInput()
     {
         player_State = GamePad.GetState(player);
 
@@ -265,9 +265,24 @@ public class C_INPUT_MANAGER : MonoBehaviour
 
         #region A/B/X/Y
         playerInput.Button_A = ButtonState.Released;
-        if(player_State.Buttons.A == ButtonState.Pressed)
+        playerInput.Button_B = ButtonState.Released;
+        playerInput.Button_X = ButtonState.Released;
+        playerInput.Button_Y = ButtonState.Released;
+        if (player_State.Buttons.A == ButtonState.Pressed)
         {
             playerInput.Button_A = ButtonState.Pressed;
+        }
+        if (player_State.Buttons.B == ButtonState.Pressed)
+        {
+            playerInput.Button_B = ButtonState.Pressed;
+        }
+        if (player_State.Buttons.X == ButtonState.Pressed)
+        {
+            playerInput.Button_X = ButtonState.Pressed;
+        }
+        if (player_State.Buttons.Y == ButtonState.Pressed)
+        {
+            playerInput.Button_Y = ButtonState.Pressed;
         }
         #endregion
 
@@ -288,11 +303,5 @@ public class C_INPUT_MANAGER : MonoBehaviour
         #endregion
 
         player_PrevState = player_State;
-    }
-	
-	// Update is called once per frame
-	internal virtual void Update ()
-    {
-        UpdatePlayerInput();
     }
 }

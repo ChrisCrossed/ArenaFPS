@@ -96,23 +96,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\C_BallLogic.cs" />
-    <Compile Include="Assets\C_BallModel.cs" />
-    <Compile Include="Assets\C_BallMovement.cs" />
-    <Compile Include="Assets\C_GoalGuide.cs" />
-    <Compile Include="Assets\C_GoalLogic.cs" />
-    <Compile Include="Assets\C_GoalTrigger.cs" />
-    <Compile Include="Assets\C_PlayerController.cs" />
-    <Compile Include="Assets\C_RotatingPieceLogic.cs" />
-    <Compile Include="Assets\C_SystemManager.cs" />
-    <Compile Include="Assets\C_WallrunColliderLogic.cs" />
+    <Compile Include="Assets\C_Shotgun.cs" />
+    <Compile Include="Assets\C_ShotgunPellet.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Procedural Mesh\ExtrudeRandomEdges.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Runtime Editing\RuntimeEdit.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Vertex Colors\HighlightNearestFace.cs" />
+    <Compile Include="Assets\Scripts\C_BallLogic.cs" />
+    <Compile Include="Assets\Scripts\C_BallModel.cs" />
+    <Compile Include="Assets\Scripts\C_BallMovement.cs" />
+    <Compile Include="Assets\Scripts\C_GoalGuide.cs" />
+    <Compile Include="Assets\Scripts\C_GoalLogic.cs" />
+    <Compile Include="Assets\Scripts\C_GoalTrigger.cs" />
     <Compile Include="Assets\Scripts\C_INPUT_MANAGER.cs" />
+    <Compile Include="Assets\Scripts\C_PlayerController.cs" />
+    <Compile Include="Assets\Scripts\C_RotatingPieceLogic.cs" />
+    <Compile Include="Assets\Scripts\C_SystemManager.cs" />
+    <Compile Include="Assets\Scripts\C_WallrunColliderLogic.cs" />
+    <Compile Include="Assets\Scripts\C_WeaponBase.cs" />
+    <Compile Include="Assets\Scripts\C_WEAPONMANAGER.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\README.txt" />

@@ -112,13 +112,15 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
+6b75b0f9203fb4a2c8dcaaf8afbe543d Assembly-CSharp.dll:.C_Shotgun
 6c4a9f34076d62a5d9f0304dab47906b Assembly-CSharp.dll:.C_SystemManager
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_BallLogic
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_WeaponBase
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_GoalGuide
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:ProBuilder2.Examples.HueCube
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_BallMovement
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_GoalTrigger
-5071afd83657eb70408486afbced723e Assembly-CSharp.dll:.C_GoalLogic
+e3babd5e271d7756d44970e127f31c0a Assembly-CSharp.dll:.C_GoalLogic
 a13e348db57cdb225ef648cd7f959981 ProBuilderCore-Unity5.dll:ProBuilder2.Common.pb_BezierShape
 d65f8e166eb4df1e46eb9eaa8ee261c1 ProBuilderCore-Unity5.dll:ProBuilder2.Common.pb_ColorPalette
 05524b8f659e7bfe5756d1335fec24ba ProBuilderCore-Unity5.dll:.pb_DummyScript
@@ -144,6 +146,7 @@ e9bdabf9265d758d56f01bb188916fa8 UnityEngine.Networking.dll:UnityEngine.Networki
 3f32f08a64daf40b09ed864d96fe3840 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransform
 73843688b51256aed059f049c540bca8 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformChild
 528ea1fd7c01796fc60c4e2f172ea229 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformVisualizer
+1df9f8dae707a82845b010c32713c624 Assembly-CSharp.dll:.C_WEAPONMANAGER
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.PlayModeRunnerCallback
 5f2ad81aa8994e8fbe25d1e57afe6773 UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.PlaymodeTestsController
 64eb32cc721b1cc68a91ed57461e188c UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.RemoteTestResultSender
@@ -156,4 +159,5 @@ c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.Spa
 8d6451ac28f90389d221fa6e5c0eaf15 Assembly-CSharp.dll:.C_PlayerController
 fd2a9c7bc371a109e82f458a25c73421 Assembly-CSharp.dll:.C_RotatingPieceLogic
 420d73cb5979b4d126f3c0d301bcca59 Assembly-CSharp.dll:ProBuilder2.Examples.CameraControls
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_ShotgunPellet
 32dcc1dca94294515dfea07e896e1a84 Assembly-CSharp.dll:ProBuilder2.Examples.RuntimeEdit
