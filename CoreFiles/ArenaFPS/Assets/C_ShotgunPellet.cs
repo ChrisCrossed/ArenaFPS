@@ -16,18 +16,29 @@ public class C_ShotgunPellet : MonoBehaviour
 
     // Set color based on team color
     Material MatColor;
+    TeamColor enemyTeamColor;
 
-	// Use this for initialization
-	void Start ()
+    // Balance Data (DO NOT SET HERE)
+    int DamagePerPellet;
+
+    public void SpawnBullet(float f_Speed_, GameObject go_Owner_, GameObject go_ProjectilePoint_, TeamColor teamColor_, int DamagePerPellet_, float PelletSpread_ )
     {
-        // gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * 1000.0f * Time.deltaTime;
+        // Set Enemy Team Color
+        enemyTeamColor = TeamColor.Red;
+        if (teamColor_ == TeamColor.Red) enemyTeamColor = TeamColor.Blue;
 
-        // SpawnBullet(1000, gameObject);
+        // Set Speed
+        f_Speed = f_Speed_;
 
-        
+        // Set Owner
+        go_Owner = go_Owner_;
+
+        DamagePerPellet = DamagePerPellet_;
+
+        SetDirection(go_ProjectilePoint_.transform.forward, PelletSpread_);
     }
 
-    public void SetDirection(Vector3 _forward, float _intensity = 5f)
+    public void SetDirection(Vector3 _forward, float _intensity)
     {
         Vector3 _direction = _forward + Random.onUnitSphere * (_intensity / 90);
 
@@ -38,30 +49,24 @@ public class C_ShotgunPellet : MonoBehaviour
         // base.RaycastBullet(BulletCreationPoint(), _direction);
     }
 
-    public void SpawnBullet(float f_Speed_, GameObject go_Owner_, GameObject go_ProjectilePoint_, TeamColor teamColor_ )
+    private void OnTriggerEnter(Collider collider_)
     {
-        // if (teamColor_ == TeamColor.Blue) MatColor = (Material)Resources.Load("Materials/Shotgun/mat_Blue");
-        // else MatColor = (Material)Resources.Load("Materials/Shotgun/mat_Red");
-        // gameObject.GetComponent<TrailRenderer>().materials[0] = MatColor;
+        if (collider_.gameObject.GetComponent<C_PlayerController>())
+        {
+            GameObject go_Player = collider_.gameObject;
+            C_PlayerController playerController = go_Player.GetComponent<C_PlayerController>();
 
-        // Set Speed
-        f_Speed = f_Speed_;
+            // If hits a player
+            if (playerController.TeamColor == enemyTeamColor)
+            {
+                playerController.ApplyDamage(go_Owner, DamagePerPellet);
+            }    
+        }
 
-        // Set Owner
-        go_Owner = go_Owner_;
+        if (collider_.gameObject.layer == LayerMask.NameToLayer("Bullet")) return;
 
-        SetDirection(go_ProjectilePoint_.transform.forward, 5f);
-
-        // Fire
-        // gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * f_Speed * Time.deltaTime;
-
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // If hits a player
-
-        // If hits an obstacle
+        // If it hits any (other) obstacle
+        DestroyBullet();
     }
 
     // Update is called once per frame

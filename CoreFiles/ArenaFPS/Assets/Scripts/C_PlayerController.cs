@@ -2,6 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#region PATCH NOTES
+
+/* ------------------------------
+ *
+ *  Version 0.0.3
+ *  
+ *  - Health and Armor
+ *      - Health Max    = 100
+ *      - Armor Max     = 50
+ *      - For every point of damage received, Armor is reduced by 2 and Damage received is halved.
+ *  
+ *  - Weapons
+ *      - Shotgun
+ *          - 3 damage per pellet
+ *          - 8 pellets per shot
+ *          - 3.5 degrees of Pellet Spread
+ *          - 3500 unit Pellet Speed
+ *          - 4 shots per 'magazine'
+ *          - 0.5 seconds between shots
+ *          - 2 seconds reload time
+ *          - Notes: If all pellets hit in one 'magazine', 96 damage is done.
+*/
+
+#endregion
+
 public class C_PlayerController : C_INPUT_MANAGER
 {
     // Connections
@@ -52,6 +77,12 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Set Layer according to team
         TeamColor = teamColor;
+
+        // Spawn Player
+        SpawnPlayer();
+
+        // Enable player
+        print("(SPAWN) Health: " + i_Health + ", Armor: " + i_Armor);
 
         base.Start();
 	}
@@ -323,6 +354,51 @@ public class C_PlayerController : C_INPUT_MANAGER
         }
 
         CameraInput();
+    }
+
+    int i_Health;
+    [SerializeField] int i_Health_Max = 100;
+    int i_Armor;
+    [SerializeField] int i_Armor_Max = 75;
+    public void ApplyDamage( GameObject go_DamagingPlayer_, int i_DamageAmount_ )
+    {
+        int i_DamageToApply = i_DamageAmount_;
+
+        if (i_Armor > 0 )
+        {
+            // Determine if player has more Armor or Damage received
+            int i_DamageToReduce = i_DamageToApply;
+            if (i_Armor < i_DamageToReduce) i_DamageToReduce = i_Armor;
+
+            // For every point of armor that exists, Reduce one point of damage received and armor remaining
+            i_Armor -= i_DamageToReduce;
+            if (i_Armor < 0) i_Armor = 0;
+
+            i_DamageToApply -= i_DamageToReduce / 2;
+        }
+
+        i_Health -= i_DamageToApply;
+        if(i_Health <= 0)
+        {
+            KillPlayer();
+        }
+        print("Health: " + i_Health + ", Armor: " + i_Armor);
+    }
+
+    public void SpawnPlayer()
+    {
+        // Set Position and Rotation
+
+        // Reset health and armor
+        i_Health = i_Health_Max;
+        i_Armor = 0;
+    }
+
+    float f_DeathTimer;
+    float f_DeathTimer_CurrMax;
+    void KillPlayer()
+    {
+
     }
 
     // Update is called once per frame

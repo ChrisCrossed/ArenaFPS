@@ -15,18 +15,48 @@ public class C_Shotgun : MonoBehaviour
     // Store player who fired
     Transform t_Player;
 
-    [SerializeField] int NumberPelletsToFire = 8;
-    [SerializeField] float PelletSpread = 5f;
-    [SerializeField] float PelletSpeed = 3500f;
+    #region PATCH DATA
+    // Each Pellet does this much damage on contact
+    int DamagePerPellet;
 
-    int i_ShotsInMagazine;
-    [SerializeField] int i_ShotsInMagazine_Max = 4;
+    // Number of pellets fired per shot
+    int NumberPelletsToFire;
 
+    // Maximum random distance for pellet spread. Lower = more accurate.
+    float PelletSpread;
+
+    // Movement speed of the pellet
+    float PelletSpeed;
+
+    // Number of shells before reloading
+    int i_ShotsInMagazine_Max;
+
+    // Minimum time required between shots
+    float f_FireDelay_Max;
+
+    // Reload time
+    float ReloadTimer_Max;
+    #endregion
+    
     // Pellet connection
     GameObject go_Pellet;
 
+    public void SET_DATA( SHOTGUN_PATCH_DATA shotgunData_ )
+    {
+        print("Received Data");
+        DamagePerPellet = shotgunData_.DamagePerPellet;
+        NumberPelletsToFire = shotgunData_.NumberPelletsToFire;
+        PelletSpread = shotgunData_.PelletSpread;
+        PelletSpeed = shotgunData_.PelletSpeed;
+        i_ShotsInMagazine_Max = shotgunData_.i_ShotsInMagazine_Max;
+        f_FireDelay_Max = shotgunData_.f_FireDelay_Max;
+        ReloadTimer_Max = shotgunData_.ReloadTimer_Max;
+
+        InitializeWeapon();
+    }
+    
     // Use this for initialization
-    void Start ()
+    void InitializeWeapon()
     {
         string shotgunPelletFile = "Weapons/ShotgunPellet";
         go_Pellet = (GameObject)Resources.Load(shotgunPelletFile, typeof(GameObject));
@@ -36,11 +66,10 @@ public class C_Shotgun : MonoBehaviour
 
         // Connect to pivot for reloading
         go_PivotBall = transform.Find("mdl_Shotgun").Find("PivotBall").gameObject;
-
     }
 
     float f_FireDelay;
-    [SerializeField] static float f_FireDelay_Max = .5f;
+    int i_ShotsInMagazine;
     public void FireShotgun(TeamColor teamColor_)
     {
         // Check 'magazine' count
@@ -56,6 +85,7 @@ public class C_Shotgun : MonoBehaviour
                 go_Pellet_.transform.rotation = projectilePoint.rotation;
                 go_Pellet_.transform.SetParent(GameObject.Find("Bullet Container").transform);
 
+                #region Set Bullet Color
                 Material[] mat_ = go_Pellet_.GetComponent<TrailRenderer>().materials;
                 if(teamColor_ == TeamColor.Red)
                 {
@@ -68,8 +98,9 @@ public class C_Shotgun : MonoBehaviour
                         mat_[j] = (Material)Resources.Load("Materials/Shotgun/mat_Blue");
                 }
                 go_Pellet_.GetComponent<TrailRenderer>().materials = mat_;
+                #endregion
 
-                go_Pellet_.GetComponent<C_ShotgunPellet>().SpawnBullet( PelletSpeed, t_Player.gameObject, projectilePoint.gameObject, teamColor_ );
+                go_Pellet_.GetComponent<C_ShotgunPellet>().SpawnBullet( PelletSpeed, t_Player.gameObject, projectilePoint.gameObject, teamColor_, DamagePerPellet, PelletSpread );
             }
 
             // Reset delay until next shot
@@ -88,7 +119,6 @@ public class C_Shotgun : MonoBehaviour
 
     GameObject go_PivotBall;
     float f_ReloadTimer;
-    static float ReloadTimer_Max = 2f;
     void Reload()
     {
         // Reduce timer
@@ -101,8 +131,6 @@ public class C_Shotgun : MonoBehaviour
                 i_ShotsInMagazine = i_ShotsInMagazine_Max;
             }
         }
-
-        print(f_ReloadTimer);
 
         Vector3 v3_PivotBallRot = go_PivotBall.transform.localEulerAngles;
 

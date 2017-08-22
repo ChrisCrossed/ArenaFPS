@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 96993454952612516}
   - component: {fileID: 114683701384784392}
   - component: {fileID: 54800701714934876}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: ShotgunPellet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
