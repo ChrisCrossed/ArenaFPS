@@ -35,9 +35,11 @@ public class C_PlayerController : C_INPUT_MANAGER
     GameObject this_CameraObject;
     GameObject[] this_WallrunCollider = new GameObject[2];
     C_WEAPONMANAGER this_WeaponManager;
+    GameObject go_SystemManager;
+    C_SystemManager this_SystemManager;
 
     // Character Movement
-    [SerializeField] float f_MaxSpeed = 5.0f;
+    [SerializeField] float f_MaxSpeed = 10.0f;
     [SerializeField] float f_CameraRot = 3.0f;
     [SerializeField] bool b_InvertedCamera = false;
     [SerializeField] float f_AirControlPercentage = 0.25f;
@@ -62,6 +64,8 @@ public class C_PlayerController : C_INPUT_MANAGER
         colliderBot = this_WallrunCollider[0].GetComponent<C_WallrunColliderLogic>();
         colliderTop = this_WallrunCollider[1].GetComponent<C_WallrunColliderLogic>();
         this_WeaponManager = this_GameObject.GetComponent<C_WEAPONMANAGER>();
+        go_SystemManager = GameObject.Find("SystemManager");
+        this_SystemManager = go_SystemManager.GetComponent<C_SystemManager>();
 
         // Raycast Connections
         RaycastPoints[0] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_0").gameObject;
@@ -80,9 +84,6 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Spawn Player
         SpawnPlayer();
-
-        // Enable player
-        print("(SPAWN) Health: " + i_Health + ", Armor: " + i_Armor);
 
         base.Start();
 	}
@@ -324,38 +325,6 @@ public class C_PlayerController : C_INPUT_MANAGER
         return b_HitGround_;
     }
 
-    float f_JumpTimer = 0.1f;
-    static float f_JumpTimer_Max = 1.0f; // (5.0) Consider making this the time for the JumpJet to 'refuel'
-    private void FixedUpdate()
-    {
-        // Reduce jump timer
-        if (f_JumpTimer > 0f)
-        {
-            f_JumpTimer -= Time.fixedDeltaTime;
-            if (f_JumpTimer <= 0f) f_JumpTimer = 0f;
-        }
-
-        if (WallrunDisabledTimer > 0)
-        {
-            WallrunDisabledTimer -= Time.fixedDeltaTime;
-            if (WallrunDisabledTimer < 0)
-            {
-                WallrunDisabledTimer = 0f;
-
-                SetWallrunColliderState = true;
-            }
-        }
-        
-        PlayerInput();
-
-        if(playerInput.Trigger_Left == XInputDotNetPure.ButtonState.Pressed && !b_TouchingGround)
-        {
-            CaptureWallrunColliders();
-        }
-
-        CameraInput();
-    }
-
     int i_Health;
     [SerializeField] int i_Health_Max = 100;
     int i_Armor;
@@ -387,7 +356,21 @@ public class C_PlayerController : C_INPUT_MANAGER
 
     public void SpawnPlayer()
     {
+        print("SPAWN");
+
+        b_IsDead = false;
+        
+        // Turn off player collider
+        gameObject.GetComponent<Collider>().enabled = true;
+
+        // Turn off player mesh renderer
+        gameObject.GetComponent<MeshRenderer>().enabled = true;
+
+        GameObject spawnPoint = this_SystemManager.PlayerRequestsSpawn(TeamColor);
+
         // Set Position and Rotation
+        this_GameObject.transform.position = spawnPoint.transform.position;
+        this_GameObject.transform.rotation = spawnPoint.transform.rotation;
 
         // Reset health and armor
         i_Health = i_Health_Max;
@@ -395,10 +378,52 @@ public class C_PlayerController : C_INPUT_MANAGER
     }
 
     float f_DeathTimer;
-    float f_DeathTimer_CurrMax;
+    float f_DeathTimer_CurrMax = 3.0f;
+    bool b_IsDead;
     void KillPlayer()
     {
+        f_DeathTimer = f_DeathTimer_CurrMax;
 
+        // Turn off player collider
+        gameObject.GetComponent<Collider>().enabled = false;
+
+        // Turn off player mesh renderer
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+    }
+
+    float f_JumpTimer = 0.1f;
+    static float f_JumpTimer_Max = 1.0f; // (5.0) Consider making this the time for the JumpJet to 'refuel'
+    private void FixedUpdate()
+    {
+        // Reduce jump timer
+        if (f_JumpTimer > 0f)
+        {
+            f_JumpTimer -= Time.fixedDeltaTime;
+            if (f_JumpTimer <= 0f) f_JumpTimer = 0f;
+        }
+
+        if (WallrunDisabledTimer > 0)
+        {
+            WallrunDisabledTimer -= Time.fixedDeltaTime;
+            if (WallrunDisabledTimer < 0)
+            {
+                WallrunDisabledTimer = 0f;
+
+                SetWallrunColliderState = true;
+            }
+        }
+        
+        if(!b_IsDead)
+        {
+            PlayerInput();
+
+            if(playerInput.Trigger_Left == XInputDotNetPure.ButtonState.Pressed && !b_TouchingGround)
+            {
+                CaptureWallrunColliders();
+            }
+
+            CameraInput();
+        }
     }
 
     // Update is called once per frame
@@ -406,10 +431,22 @@ public class C_PlayerController : C_INPUT_MANAGER
     {
         base.UpdatePlayerInput();
 
-        if(playerInput.Trigger_Right == XInputDotNetPure.ButtonState.Pressed)
+        if (playerInput.Trigger_Right == XInputDotNetPure.ButtonState.Pressed)
         {
             this_WeaponManager.FireGun();
         }
+
+        if(f_DeathTimer > 0f)
+        {
+            f_DeathTimer -= Time.deltaTime;
+            print(f_DeathTimer);
+            if(f_DeathTimer < 0f)
+            {
+                f_DeathTimer = 0;
+                SpawnPlayer();
+            }
+        }
+
 
         if (Input.GetKeyDown(KeyCode.Escape) || playerInput.Button_Start == XInputDotNetPure.ButtonState.Pressed)
             Application.Quit();

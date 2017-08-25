@@ -43,7 +43,6 @@ public class C_Shotgun : MonoBehaviour
 
     public void SET_DATA( SHOTGUN_PATCH_DATA shotgunData_ )
     {
-        print("Received Data");
         DamagePerPellet = shotgunData_.DamagePerPellet;
         NumberPelletsToFire = shotgunData_.NumberPelletsToFire;
         PelletSpread = shotgunData_.PelletSpread;

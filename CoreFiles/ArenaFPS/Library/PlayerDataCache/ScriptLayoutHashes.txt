@@ -161,3 +161,4 @@ fd2a9c7bc371a109e82f458a25c73421 Assembly-CSharp.dll:.C_RotatingPieceLogic
 420d73cb5979b4d126f3c0d301bcca59 Assembly-CSharp.dll:ProBuilder2.Examples.CameraControls
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_ShotgunPellet
 32dcc1dca94294515dfea07e896e1a84 Assembly-CSharp.dll:ProBuilder2.Examples.RuntimeEdit
+16304c3e63d00d2fa37d4710cf0e81ed Assembly-CSharp.dll:.C_SpawnPoint
