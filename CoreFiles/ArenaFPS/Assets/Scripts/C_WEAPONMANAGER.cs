@@ -7,7 +7,7 @@ public enum WeaponList
 {
     None,
     Shotgun,
-    MachineGun,
+    StaticGun,
 }
 
 public class SHOTGUN_PATCH_DATA
@@ -135,7 +135,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         {
             shotgun.FireShotgun(teamColor);
         }
-        else if (CurrentWeapon == WeaponList.MachineGun)
+        else if (CurrentWeapon == WeaponList.StaticGun)
         {
 
         }
@@ -147,7 +147,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         {
             shotgun.ReloadGun();
         }
-        else if (CurrentWeapon == WeaponList.MachineGun)
+        else if (CurrentWeapon == WeaponList.StaticGun)
         {
 
         }
