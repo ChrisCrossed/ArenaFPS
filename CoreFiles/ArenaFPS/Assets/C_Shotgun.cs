@@ -71,6 +71,9 @@ public class C_Shotgun : MonoBehaviour
     int i_ShotsInMagazine;
     public void FireShotgun(TeamColor teamColor_)
     {
+        // Don't let the gun fire if it's not ready
+        if (weaponState != WeaponState.Ready) return;
+        
         // Check 'magazine' count
         if (i_ShotsInMagazine > 0 && f_FireDelay == 0)
         {
@@ -120,8 +123,10 @@ public class C_Shotgun : MonoBehaviour
     void Reload()
     {
         // Reduce timer
-        if(f_ReloadTimer > 0) f_ReloadTimer -= Time.deltaTime;
+        if(f_ReloadTimer > 0) 
         {
+            f_ReloadTimer -= Time.deltaTime;
+
             if (f_ReloadTimer < 0)
             {
                 f_ReloadTimer = 0f;
@@ -132,29 +137,33 @@ public class C_Shotgun : MonoBehaviour
 
         Vector3 v3_PivotBallRot = go_PivotBall.transform.localEulerAngles;
 
-        // Put barrel down to reload
-        if(f_ReloadTimer > Time.deltaTime * 75f)
+        float TimeToMoveToPosition = 0.5f;
+        float GunDownTime = ReloadTimer_Max - TimeToMoveToPosition;
+        float GunUpTime = TimeToMoveToPosition;
+
+        // f_Timer counts downward from Max until 0.
+        if (f_ReloadTimer > GunDownTime)
         {
-            if(v3_PivotBallRot.x < 30f)
+            if (v3_PivotBallRot.x < 30f)
             {
-                v3_PivotBallRot.x += Time.deltaTime * 75f;
+                v3_PivotBallRot.x += Time.deltaTime * 30f * 2f;
 
                 if (v3_PivotBallRot.x > 30f) v3_PivotBallRot.x = 30f;
+                print(v3_PivotBallRot.x);
             }
         }
-        else
+        else if(f_ReloadTimer < GunUpTime)
         {
             if(v3_PivotBallRot.x > 0f)
             {
-                v3_PivotBallRot.x -= Time.deltaTime * 75f;
+                v3_PivotBallRot.x -= Time.deltaTime * 30f * 2f;
 
-                if (v3_PivotBallRot.x < 0) v3_PivotBallRot.x = 0f;
+                if (f_ReloadTimer == 0f) v3_PivotBallRot.x = 0f;
+                print(v3_PivotBallRot.x);
             }
         }
 
-        // We already confirmed above that the weapon is done reloading. Snap to proper position.
-        if (weaponState == WeaponState.Ready) v3_PivotBallRot.x = 0f;
-
+        // Apply rotation
         go_PivotBall.transform.localEulerAngles = v3_PivotBallRot;
     }
 

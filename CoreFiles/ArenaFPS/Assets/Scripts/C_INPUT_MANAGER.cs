@@ -183,6 +183,7 @@ public class C_INPUT_MANAGER : MonoBehaviour
     internal virtual void Start ()
     {
         playerInput = new PlayerInput();
+        player_PrevState = new GamePadState();
 
         // Controller input
         v2_DPad = new Vector2();

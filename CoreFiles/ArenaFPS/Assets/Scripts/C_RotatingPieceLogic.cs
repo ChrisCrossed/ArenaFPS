@@ -13,7 +13,7 @@ public class C_RotatingPieceLogic : MonoBehaviour
     }
 
     [SerializeField] float AngledRotation = 30f;
-    float CurrentEndRotation;
+    // float CurrentEndRotation;
     Rigidbody this_Rigidbody;
 
     // Hardcoded values
@@ -30,7 +30,7 @@ public class C_RotatingPieceLogic : MonoBehaviour
     {
         this_Rigidbody = gameObject.GetComponent<Rigidbody>();
 
-        CurrentEndRotation = AngledRotation;
+        // CurrentEndRotation = AngledRotation;
 
         // Hardcoded values
         Angle_0 = AngledRotation;

@@ -11,7 +11,7 @@ public class C_SystemManager : MonoBehaviour
     // Team Scores
     int i_Score_Blue;
     int i_Score_Red;
-    [SerializeField] int i_Score_Max = 3;
+    // [SerializeField] int i_Score_Max = 3;
 
     private void Awake()
     {
