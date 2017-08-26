@@ -35,6 +35,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     GameObject this_CameraObject;
     GameObject[] this_WallrunCollider = new GameObject[2];
     C_WEAPONMANAGER this_WeaponManager;
+    GameObject go_WeaponObject;
     GameObject go_SystemManager;
     C_SystemManager this_SystemManager;
 
@@ -63,6 +64,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_WallrunCollider[1] = this_GameObject.transform.Find("WallrunCollider_Bottom").gameObject;
         colliderBot = this_WallrunCollider[0].GetComponent<C_WallrunColliderLogic>();
         colliderTop = this_WallrunCollider[1].GetComponent<C_WallrunColliderLogic>();
+        go_WeaponObject = this_CameraObject.transform.Find("Weapons").gameObject;
         this_WeaponManager = this_GameObject.GetComponent<C_WEAPONMANAGER>();
         go_SystemManager = GameObject.Find("SystemManager");
         this_SystemManager = go_SystemManager.GetComponent<C_SystemManager>();
@@ -84,6 +86,9 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Spawn Player
         SpawnPlayer();
+        
+        // Initialize playerInput_Old
+        playerInput_Old = new PlayerInput();
 
         base.Start();
 	}
@@ -372,6 +377,13 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_GameObject.transform.position = spawnPoint.transform.position;
         this_GameObject.transform.rotation = spawnPoint.transform.rotation;
 
+        // Enable weapons (models)
+        go_WeaponObject.SetActive(true);
+        this_CameraObject.transform.Find("Visors").gameObject.SetActive(true);
+
+        // Reset camera rotation
+        f_VertAngle = 0f;
+
         // Reset health and armor
         i_Health = i_Health_Max;
         i_Armor = 0;
@@ -389,10 +401,15 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Turn off player mesh renderer
         gameObject.GetComponent<MeshRenderer>().enabled = false;
+
+        // Disable weapons (models)
+        go_WeaponObject.SetActive(false);
+        this_CameraObject.transform.Find("Visors").gameObject.SetActive(false);
     }
 
     float f_JumpTimer = 0.1f;
     static float f_JumpTimer_Max = 1.0f; // (5.0) Consider making this the time for the JumpJet to 'refuel'
+    PlayerInput playerInput_Old;
     private void FixedUpdate()
     {
         // Reduce jump timer
@@ -421,6 +438,20 @@ public class C_PlayerController : C_INPUT_MANAGER
             {
                 CaptureWallrunColliders();
             }
+
+            // User holds down Left Bumper or 'Y' button
+            if (playerInput.Button_Y == XInputDotNetPure.ButtonState.Pressed)
+            {
+                print("Weapon Wheel");
+            }
+
+            if (playerInput.Button_X == XInputDotNetPure.ButtonState.Pressed && playerInput_Old.Button_X == XInputDotNetPure.ButtonState.Released)
+            {
+                this_WeaponManager.ReloadGun();
+            }
+            
+
+            playerInput_Old = playerInput;
 
             CameraInput();
         }

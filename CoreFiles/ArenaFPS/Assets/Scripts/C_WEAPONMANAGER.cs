@@ -140,22 +140,16 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
         }
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public void ReloadGun()
     {
-        base.UpdatePlayerInput();
-
-        if(playerInput.Button_Y == XInputDotNetPure.ButtonState.Pressed)
+        if (CurrentWeapon == WeaponList.Shotgun)
         {
-            print("Weapon Wheel");
+            shotgun.ReloadGun();
         }
+        else if (CurrentWeapon == WeaponList.MachineGun)
+        {
 
-        // base.Update();
-
-		// User holds down Left Bumper or 'Y' button
-
-        // User uses Left or Right Analog stick, depending on button held, to select weapon
-
-	}
+        }
+    }
 }

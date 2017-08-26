@@ -59,7 +59,7 @@ public class C_Shotgun : MonoBehaviour
     {
         string shotgunPelletFile = "Weapons/ShotgunPellet";
         go_Pellet = (GameObject)Resources.Load(shotgunPelletFile, typeof(GameObject));
-        t_Player = transform.parent;
+        t_Player = transform.parent.transform.parent;
 
         i_ShotsInMagazine = i_ShotsInMagazine_Max;
 
@@ -110,8 +110,7 @@ public class C_Shotgun : MonoBehaviour
 
             if(i_ShotsInMagazine == 0)
             {
-                weaponState = WeaponState.Reloading;
-                f_ReloadTimer = ReloadTimer_Max;
+                ReloadGun();
             }
         }
     }
@@ -157,6 +156,15 @@ public class C_Shotgun : MonoBehaviour
         if (weaponState == WeaponState.Ready) v3_PivotBallRot.x = 0f;
 
         go_PivotBall.transform.localEulerAngles = v3_PivotBallRot;
+    }
+
+    public void ReloadGun()
+    {
+        if( i_ShotsInMagazine < i_ShotsInMagazine_Max && weaponState != WeaponState.Reloading )
+        {
+            weaponState = WeaponState.Reloading;
+            f_ReloadTimer = ReloadTimer_Max;
+        }
     }
     
     // Update is called once per frame

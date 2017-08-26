@@ -51,6 +51,9 @@ public class C_ShotgunPellet : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider_)
     {
+        // Ignore the player firing the bullet
+        if (collider_.gameObject == go_Owner) return;
+
         if (collider_.gameObject.GetComponent<C_PlayerController>())
         {
             GameObject go_Player = collider_.gameObject;
@@ -63,8 +66,8 @@ public class C_ShotgunPellet : MonoBehaviour
             }    
         }
 
-        if (collider_.gameObject.layer == LayerMask.NameToLayer("Bullet")) return;
-
+        // if (collider_.gameObject.layer == LayerMask.NameToLayer("Bullet")) return;
+        
         // If it hits any (other) obstacle
         DestroyBullet();
     }
@@ -72,22 +75,27 @@ public class C_ShotgunPellet : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        f_Timer += Time.deltaTime;
-
-        if(f_Timer > f_Timer_Max)
-        {
-            DestroyBullet();
-        }
+        
     }
 
     private void FixedUpdate()
     {
+        f_Timer += Time.fixedDeltaTime;
+
+        if (f_Timer > f_Timer_Max)
+        {
+            DestroyBullet();
+        }
+
         // Fire
         gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * f_Speed * Time.deltaTime;
     }
 
     void DestroyBullet()
     {
-        GameObject.Destroy(this);
+        // Turn off the trail renderer
+        // transform.GetComponent<TrailRenderer>().
+
+        GameObject.Destroy(gameObject);
     }
 }
