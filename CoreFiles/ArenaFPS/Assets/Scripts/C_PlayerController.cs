@@ -361,8 +361,6 @@ public class C_PlayerController : C_INPUT_MANAGER
 
     public void SpawnPlayer()
     {
-        print("SPAWN");
-
         b_IsDead = false;
         
         // Turn off player collider
@@ -442,7 +440,7 @@ public class C_PlayerController : C_INPUT_MANAGER
             // User holds down Left Bumper or 'Y' button
             if (playerInput.Button_Y == XInputDotNetPure.ButtonState.Pressed)
             {
-                print("Weapon Wheel");
+                // print("Weapon Wheel");
             }
 
             if (playerInput.Button_X == XInputDotNetPure.ButtonState.Pressed && playerInput_Old.Button_X == XInputDotNetPure.ButtonState.Released)
@@ -450,7 +448,6 @@ public class C_PlayerController : C_INPUT_MANAGER
                 this_WeaponManager.ReloadGun();
             }
             
-
             playerInput_Old = playerInput;
 
             CameraInput();
@@ -478,7 +475,15 @@ public class C_PlayerController : C_INPUT_MANAGER
             }
         }
 
-
+        if(Input.GetKeyDown(KeyCode.O))
+        {
+            this_WeaponManager.SetNextGun(WeaponList.Shotgun);
+        }
+        else if(Input.GetKeyDown(KeyCode.P))
+        {
+            this_WeaponManager.SetNextGun(WeaponList.StaticGun);
+        }
+        
         if (Input.GetKeyDown(KeyCode.Escape) || playerInput.Button_Start == XInputDotNetPure.ButtonState.Pressed)
             Application.Quit();
     }

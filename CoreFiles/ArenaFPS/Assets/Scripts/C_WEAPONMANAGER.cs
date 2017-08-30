@@ -57,6 +57,15 @@ public class SHOTGUN_PATCH_DATA
 
 public class C_WEAPONMANAGER : C_INPUT_MANAGER
 {
+    enum CurrentWeaponState
+    {
+        WeaponInUse,
+        WaitingForResponse,
+        ResponseReceived
+    }
+
+    CurrentWeaponState currentWeaponState = CurrentWeaponState.WeaponInUse;
+
     // Bullet Container
     Transform t_BulletContainer;
 
@@ -150,6 +159,72 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         else if (CurrentWeapon == WeaponList.StaticGun)
         {
 
+        }
+    }
+
+    public void SetNextGun(WeaponList nextWeapon_)
+    {
+        // Don't continue if a gun is not already ready
+        if (currentWeaponState != CurrentWeaponState.WeaponInUse)
+        {
+            print("RETURN - Not 'WeaponInUse': " + currentWeaponState.ToString());
+            return;
+        }
+
+        // Don't run if they're the same weapon already
+        if (nextWeapon_ == CurrentWeapon)
+        {
+            print("RETURN - Same Weapon': " + nextWeapon_.ToString());
+            return;
+        }
+
+        print("Current gun: " + CurrentWeapon.ToString());
+
+        // Tell current weapon to change state to 'Disable'
+        if(CurrentWeapon == WeaponList.Shotgun)
+        {
+            shotgun.WeaponState = WeaponState.Disable;
+        }
+        else if(CurrentWeapon == WeaponList.StaticGun)
+        {
+            // staticGun.WeaponState = WeaponState.Disable;
+        }
+
+        // Set Current Weapon
+        PreviousWeapon = CurrentWeapon;
+        CurrentWeapon = nextWeapon_;
+
+        // Set CurrentWeaponState to 'waiting
+        currentWeaponState = CurrentWeaponState.WaitingForResponse;
+    }
+
+    public void ReadyForNextWeapon()
+    {
+        currentWeaponState = CurrentWeaponState.ResponseReceived;
+        print("READY FOR NEXT WEAPON");
+    }
+
+    private void Update()
+    {
+        if(currentWeaponState == CurrentWeaponState.ResponseReceived)
+        {
+            // Activate next weapon
+            if(CurrentWeapon == WeaponList.Shotgun)
+            {
+                shotgun.WeaponState = WeaponState.Enable;
+            }
+            else if(CurrentWeapon == WeaponList.StaticGun)
+            {
+                // staticGun.WeaponState = WeaponState.Enable
+            }
+
+            currentWeaponState = CurrentWeaponState.WeaponInUse;
+        }
+
+        // TEST
+        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        {
+            ReadyForNextWeapon();
         }
     }
 }

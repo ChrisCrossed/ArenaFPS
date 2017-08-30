@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WeaponState
+{
+    Ready,
+    Reloading,
+    Enable,
+    Disable
+}
+
 public class C_Shotgun : MonoBehaviour
 {
-    enum WeaponState
-    {
-        Ready,
-        Reloading
-    }
 
     WeaponState weaponState = WeaponState.Ready;
 
@@ -41,6 +44,12 @@ public class C_Shotgun : MonoBehaviour
     // Pellet connection
     GameObject go_Pellet;
 
+    // Weapon Model
+    GameObject go_ShotgunModel;
+
+    // Weapon Manager
+    C_WEAPONMANAGER WeaponManager;
+
     public void SET_DATA( SHOTGUN_PATCH_DATA shotgunData_ )
     {
         DamagePerPellet = shotgunData_.DamagePerPellet;
@@ -53,6 +62,38 @@ public class C_Shotgun : MonoBehaviour
 
         InitializeWeapon();
     }
+
+    public WeaponState WeaponState
+    {
+        set
+        {
+            if( weaponState != value)
+            {
+                weaponState = value;
+
+                SetWeaponState(value);
+            }
+        }
+        get
+        {
+            return weaponState;
+        }
+    }
+
+    float f_WeaponState_Timer;
+    float f_WeaponState_Timer_Max = 1.0f;
+    float f_WeaponDisableRotation = 60f;
+    void SetWeaponState( WeaponState weaponState_ )
+    {
+        if(weaponState_ == WeaponState.Enable)
+        {
+            f_WeaponState_Timer = f_WeaponState_Timer_Max;
+        }
+        else if(weaponState_ == WeaponState.Disable)
+        {
+            f_WeaponState_Timer = 0f;
+        }
+    }
     
     // Use this for initialization
     void InitializeWeapon()
@@ -60,11 +101,13 @@ public class C_Shotgun : MonoBehaviour
         string shotgunPelletFile = "Weapons/ShotgunPellet";
         go_Pellet = (GameObject)Resources.Load(shotgunPelletFile, typeof(GameObject));
         t_Player = transform.parent.transform.parent;
+        WeaponManager = t_Player.GetComponent<C_WEAPONMANAGER>();
 
         i_ShotsInMagazine = i_ShotsInMagazine_Max;
 
         // Connect to pivot for reloading
-        go_PivotBall = transform.Find("mdl_Shotgun").Find("PivotBall").gameObject;
+        go_ShotgunModel = transform.Find("mdl_Shotgun").gameObject;
+        go_PivotBall = go_ShotgunModel.transform.Find("PivotBall").gameObject;
     }
 
     float f_FireDelay;
@@ -72,7 +115,7 @@ public class C_Shotgun : MonoBehaviour
     public void FireShotgun(TeamColor teamColor_)
     {
         // Don't let the gun fire if it's not ready
-        if (weaponState != WeaponState.Ready) return;
+        if (WeaponState != WeaponState.Ready) return;
         
         // Check 'magazine' count
         if (i_ShotsInMagazine > 0 && f_FireDelay == 0)
@@ -130,7 +173,7 @@ public class C_Shotgun : MonoBehaviour
             if (f_ReloadTimer < 0)
             {
                 f_ReloadTimer = 0f;
-                weaponState = WeaponState.Ready;
+                WeaponState = WeaponState.Ready;
                 i_ShotsInMagazine = i_ShotsInMagazine_Max;
             }
         }
@@ -171,7 +214,7 @@ public class C_Shotgun : MonoBehaviour
     {
         if( i_ShotsInMagazine < i_ShotsInMagazine_Max && weaponState != WeaponState.Reloading )
         {
-            weaponState = WeaponState.Reloading;
+            WeaponState = WeaponState.Reloading;
             f_ReloadTimer = ReloadTimer_Max;
         }
     }
@@ -185,9 +228,57 @@ public class C_Shotgun : MonoBehaviour
             if (f_FireDelay < 0f) f_FireDelay = 0f;
         }
 
-		if(weaponState == WeaponState.Reloading)
+		if(WeaponState == WeaponState.Reloading)
         {
             Reload();
+        }
+
+        if (WeaponState == WeaponState.Enable)
+        {
+            if (f_WeaponState_Timer > 0f)
+            {
+                f_WeaponState_Timer -= Time.deltaTime;
+
+                if (f_WeaponState_Timer <= 0f)
+                {
+                    f_WeaponState_Timer = 0f;
+
+                    WeaponState = WeaponState.Ready;
+                }
+
+                print(f_WeaponState_Timer);
+
+                // Rotate game object based on percentage
+                float f_Perc = f_WeaponState_Timer / f_WeaponState_Timer_Max;
+                Vector3 v3_Rot = go_ShotgunModel.transform.localEulerAngles;
+                v3_Rot.x = f_Perc * f_WeaponDisableRotation;
+                go_ShotgunModel.transform.localEulerAngles = v3_Rot;
+            }
+        }
+        else if (WeaponState == WeaponState.Disable)
+        {
+            if (f_WeaponState_Timer < f_WeaponState_Timer_Max)
+            {
+                // Begin adding to weaponstate timer.
+                f_WeaponState_Timer += Time.deltaTime;
+
+                // If capped out, set state to ready.
+                if (f_WeaponState_Timer > f_WeaponState_Timer_Max)
+                {
+                    f_WeaponState_Timer = f_WeaponState_Timer_Max;
+                    
+                    // Tell Weapon Manager we completed
+                    WeaponManager.ReadyForNextWeapon();
+                }
+
+                // Rotate game object based on percentage.
+                float f_Perc = f_WeaponState_Timer / f_WeaponState_Timer_Max;
+                Vector3 v3_Rot = go_ShotgunModel.transform.localEulerAngles;
+                v3_Rot.x = f_Perc * f_WeaponDisableRotation;
+                go_ShotgunModel.transform.localEulerAngles = v3_Rot;
+            }
+
+            
         }
 	}
 }
