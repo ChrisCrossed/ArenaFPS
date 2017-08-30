@@ -12,9 +12,6 @@ public enum WeaponState
 
 public class C_Shotgun : C_WEAPON
 {
-    // Store player who fired
-    Transform t_Player;
-
     #region PATCH DATA
     // Each Pellet does this much damage on contact
     int DamagePerPellet;
@@ -36,13 +33,7 @@ public class C_Shotgun : C_WEAPON
     #endregion
     
     // Pellet connection
-    GameObject go_Pellet;
-
-    // Weapon Model
-    GameObject go_ShotgunModel;
-
-    // Weapon Manager
-    C_WEAPONMANAGER WeaponManager;
+    GameObject go_Bullet;
 
     public void SET_DATA( SHOTGUN_PATCH_DATA shotgunData_ )
     {
@@ -50,7 +41,7 @@ public class C_Shotgun : C_WEAPON
         NumberPelletsToFire = shotgunData_.NumberPelletsToFire;
         PelletSpread = shotgunData_.PelletSpread;
         PelletSpeed = shotgunData_.PelletSpeed;
-        i_ShotsInMagazine = shotgunData_.i_ShotsInMagazine_Max;
+        i_ShotsInMagazine_Max = shotgunData_.i_ShotsInMagazine_Max;
         f_FireDelay_Max = shotgunData_.f_FireDelay_Max;
         ReloadTimer_Max = shotgunData_.ReloadTimer_Max;
 
@@ -61,20 +52,17 @@ public class C_Shotgun : C_WEAPON
     void InitializeWeapon()
     {
         string shotgunPelletFile = "Weapons/ShotgunPellet";
-        go_Pellet = (GameObject)Resources.Load(shotgunPelletFile, typeof(GameObject));
-        t_Player = transform.parent.transform.parent;
-        WeaponManager = t_Player.GetComponent<C_WEAPONMANAGER>();
-
+        go_Bullet = (GameObject)Resources.Load(shotgunPelletFile, typeof(GameObject));
+        
         i_ShotsInMagazine = i_ShotsInMagazine_Max;
 
         // Connect to pivot for reloading
-        go_ShotgunModel = transform.Find("mdl_Shotgun").gameObject;
-        go_PivotBall = go_ShotgunModel.transform.Find("PivotBall").gameObject;
+        go_WeaponModel = transform.Find("mdl_Shotgun").gameObject;
+        go_PivotBall = go_WeaponModel.transform.Find("PivotBall").gameObject;
     }
     
     public void FireShotgun(TeamColor teamColor_)
     {
-        print(i_ShotsInMagazine);
         // Don't let the gun fire if it's not ready
         if (WeaponState != WeaponState.Ready) return;
         
@@ -84,7 +72,7 @@ public class C_Shotgun : C_WEAPON
             // Fire group of pellets
             for(int i = 0; i < NumberPelletsToFire; ++i)
             {
-                GameObject go_Pellet_ = Instantiate(go_Pellet);
+                GameObject go_Pellet_ = Instantiate(go_Bullet);
 
                 Transform projectilePoint = transform.Find("mdl_Shotgun").transform.Find("ProjectilePoint");
                 go_Pellet_.transform.position = projectilePoint.position;
@@ -122,8 +110,9 @@ public class C_Shotgun : C_WEAPON
         }
     }
     
-    new public void Reload()
+    public override void Reload()
     {
+        // Done because parent is 'virtual public void Reload()'
         base.Reload();
 
         Vector3 v3_PivotBallRot = go_PivotBall.transform.localEulerAngles;
@@ -140,7 +129,6 @@ public class C_Shotgun : C_WEAPON
                 v3_PivotBallRot.x += Time.deltaTime * 30f * 2f;
 
                 if (v3_PivotBallRot.x > 30f) v3_PivotBallRot.x = 30f;
-                print(v3_PivotBallRot.x);
             }
         }
         else if(f_ReloadTimer < GunUpTime)
@@ -150,7 +138,6 @@ public class C_Shotgun : C_WEAPON
                 v3_PivotBallRot.x -= Time.deltaTime * 30f * 2f;
 
                 if (f_ReloadTimer == 0f) v3_PivotBallRot.x = 0f;
-                print(v3_PivotBallRot.x);
             }
         }
 
@@ -164,67 +151,6 @@ public class C_Shotgun : C_WEAPON
         {
             WeaponState = WeaponState.Reloading;
             f_ReloadTimer = ReloadTimer_Max;
-        }
-    }
-
-    // Update is called once per frame
-    new void Update()
-    {
-        if (f_FireDelay > 0f)
-        {
-            f_FireDelay -= Time.deltaTime;
-            if (f_FireDelay < 0f) f_FireDelay = 0f;
-        }
-
-        if (WeaponState == WeaponState.Reloading)
-        {
-            Reload();
-        }
-
-        if (WeaponState == WeaponState.Enable)
-        {
-            if (f_WeaponState_Timer > 0f)
-            {
-                f_WeaponState_Timer -= Time.deltaTime;
-
-                if (f_WeaponState_Timer <= 0f)
-                {
-                    f_WeaponState_Timer = 0f;
-
-                    WeaponState = WeaponState.Ready;
-                }
-
-                print(f_WeaponState_Timer);
-
-                // Rotate game object based on percentage
-                float f_Perc = f_WeaponState_Timer / f_WeaponState_Timer_Max;
-                Vector3 v3_Rot = go_ShotgunModel.transform.localEulerAngles;
-                v3_Rot.x = f_Perc * f_WeaponDisableRotation;
-                go_ShotgunModel.transform.localEulerAngles = v3_Rot;
-            }
-        }
-        else if (WeaponState == WeaponState.Disable)
-        {
-            if (f_WeaponState_Timer < f_WeaponState_Timer_Max)
-            {
-                // Begin adding to weaponstate timer.
-                f_WeaponState_Timer += Time.deltaTime;
-
-                // If capped out, set state to ready.
-                if (f_WeaponState_Timer > f_WeaponState_Timer_Max)
-                {
-                    f_WeaponState_Timer = f_WeaponState_Timer_Max;
-
-                    // Tell Weapon Manager we completed
-                    WeaponManager.ReadyForNextWeapon();
-                }
-
-                // Rotate game object based on percentage.
-                float f_Perc = f_WeaponState_Timer / f_WeaponState_Timer_Max;
-                Vector3 v3_Rot = go_ShotgunModel.transform.localEulerAngles;
-                v3_Rot.x = f_Perc * f_WeaponDisableRotation;
-                go_ShotgunModel.transform.localEulerAngles = v3_Rot;
-            }
         }
     }
 }
