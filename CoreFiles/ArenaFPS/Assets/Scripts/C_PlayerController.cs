@@ -467,7 +467,6 @@ public class C_PlayerController : C_INPUT_MANAGER
         if(f_DeathTimer > 0f)
         {
             f_DeathTimer -= Time.deltaTime;
-            print(f_DeathTimer);
             if(f_DeathTimer < 0f)
             {
                 f_DeathTimer = 0;

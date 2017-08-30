@@ -99,6 +99,8 @@
     <Compile Include="Assets\C_Shotgun.cs" />
     <Compile Include="Assets\C_ShotgunPellet.cs" />
     <Compile Include="Assets\C_SpawnPoint.cs" />
+    <Compile Include="Assets\C_StaticGun.cs" />
+    <Compile Include="Assets\C_WEAPON.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
@@ -116,7 +118,6 @@
     <Compile Include="Assets\Scripts\C_RotatingPieceLogic.cs" />
     <Compile Include="Assets\Scripts\C_SystemManager.cs" />
     <Compile Include="Assets\Scripts\C_WallrunColliderLogic.cs" />
-    <Compile Include="Assets\Scripts\C_WeaponBase.cs" />
     <Compile Include="Assets\Scripts\C_WEAPONMANAGER.cs" />
   </ItemGroup>
   <ItemGroup>

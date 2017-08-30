@@ -10,11 +10,8 @@ public enum WeaponState
     Disable
 }
 
-public class C_Shotgun : MonoBehaviour
+public class C_Shotgun : C_WEAPON
 {
-
-    WeaponState weaponState = WeaponState.Ready;
-
     // Store player who fired
     Transform t_Player;
 
@@ -30,10 +27,7 @@ public class C_Shotgun : MonoBehaviour
 
     // Movement speed of the pellet
     float PelletSpeed;
-
-    // Number of shells before reloading
-    int i_ShotsInMagazine_Max;
-
+    
     // Minimum time required between shots
     float f_FireDelay_Max;
 
@@ -56,43 +50,11 @@ public class C_Shotgun : MonoBehaviour
         NumberPelletsToFire = shotgunData_.NumberPelletsToFire;
         PelletSpread = shotgunData_.PelletSpread;
         PelletSpeed = shotgunData_.PelletSpeed;
-        i_ShotsInMagazine_Max = shotgunData_.i_ShotsInMagazine_Max;
+        i_ShotsInMagazine = shotgunData_.i_ShotsInMagazine_Max;
         f_FireDelay_Max = shotgunData_.f_FireDelay_Max;
         ReloadTimer_Max = shotgunData_.ReloadTimer_Max;
 
         InitializeWeapon();
-    }
-
-    public WeaponState WeaponState
-    {
-        set
-        {
-            if( weaponState != value)
-            {
-                weaponState = value;
-
-                SetWeaponState(value);
-            }
-        }
-        get
-        {
-            return weaponState;
-        }
-    }
-
-    float f_WeaponState_Timer;
-    float f_WeaponState_Timer_Max = 1.0f;
-    float f_WeaponDisableRotation = 60f;
-    void SetWeaponState( WeaponState weaponState_ )
-    {
-        if(weaponState_ == WeaponState.Enable)
-        {
-            f_WeaponState_Timer = f_WeaponState_Timer_Max;
-        }
-        else if(weaponState_ == WeaponState.Disable)
-        {
-            f_WeaponState_Timer = 0f;
-        }
     }
     
     // Use this for initialization
@@ -109,11 +71,10 @@ public class C_Shotgun : MonoBehaviour
         go_ShotgunModel = transform.Find("mdl_Shotgun").gameObject;
         go_PivotBall = go_ShotgunModel.transform.Find("PivotBall").gameObject;
     }
-
-    float f_FireDelay;
-    int i_ShotsInMagazine;
+    
     public void FireShotgun(TeamColor teamColor_)
     {
+        print(i_ShotsInMagazine);
         // Don't let the gun fire if it's not ready
         if (WeaponState != WeaponState.Ready) return;
         
@@ -160,23 +121,10 @@ public class C_Shotgun : MonoBehaviour
             }
         }
     }
-
-    GameObject go_PivotBall;
-    float f_ReloadTimer;
-    void Reload()
+    
+    new public void Reload()
     {
-        // Reduce timer
-        if(f_ReloadTimer > 0) 
-        {
-            f_ReloadTimer -= Time.deltaTime;
-
-            if (f_ReloadTimer < 0)
-            {
-                f_ReloadTimer = 0f;
-                WeaponState = WeaponState.Ready;
-                i_ShotsInMagazine = i_ShotsInMagazine_Max;
-            }
-        }
+        base.Reload();
 
         Vector3 v3_PivotBallRot = go_PivotBall.transform.localEulerAngles;
 
@@ -212,23 +160,23 @@ public class C_Shotgun : MonoBehaviour
 
     public void ReloadGun()
     {
-        if( i_ShotsInMagazine < i_ShotsInMagazine_Max && weaponState != WeaponState.Reloading )
+        if( i_ShotsInMagazine < i_ShotsInMagazine_Max && WeaponState != WeaponState.Reloading )
         {
             WeaponState = WeaponState.Reloading;
             f_ReloadTimer = ReloadTimer_Max;
         }
     }
-    
+
     // Update is called once per frame
-    void Update ()
+    new void Update()
     {
-        if(f_FireDelay > 0f)
+        if (f_FireDelay > 0f)
         {
             f_FireDelay -= Time.deltaTime;
             if (f_FireDelay < 0f) f_FireDelay = 0f;
         }
 
-		if(WeaponState == WeaponState.Reloading)
+        if (WeaponState == WeaponState.Reloading)
         {
             Reload();
         }
@@ -266,7 +214,7 @@ public class C_Shotgun : MonoBehaviour
                 if (f_WeaponState_Timer > f_WeaponState_Timer_Max)
                 {
                     f_WeaponState_Timer = f_WeaponState_Timer_Max;
-                    
+
                     // Tell Weapon Manager we completed
                     WeaponManager.ReadyForNextWeapon();
                 }
@@ -277,8 +225,6 @@ public class C_Shotgun : MonoBehaviour
                 v3_Rot.x = f_Perc * f_WeaponDisableRotation;
                 go_ShotgunModel.transform.localEulerAngles = v3_Rot;
             }
-
-            
         }
-	}
+    }
 }
