@@ -213,7 +213,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         }
         else if (CurrentWeapon == WeaponList.StaticGun)
         {
-            staticGun.ReloadGun();
+            staticGun.ReloadEnergy();
         }
     }
 

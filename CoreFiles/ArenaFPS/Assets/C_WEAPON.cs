@@ -76,7 +76,12 @@ public class C_WEAPON : MonoBehaviour
             {
                 f_ReloadTimer = 0f;
                 WeaponState = WeaponState.Ready;
+                
+                // For 'count' weapons (shotguns, projectiles, raycast)
                 i_ShotsInMagazine = i_ShotsInMagazine_Max;
+
+                // For 'time' weapons (energy)
+                CurrentEnergyInSeconds = MaxEnergyInSeconds;
             }
         }
     }
@@ -98,6 +103,19 @@ public class C_WEAPON : MonoBehaviour
         if (i_ShotsInMagazine < i_ShotsInMagazine_Max && WeaponState != WeaponState.Reloading)
         {
             WeaponState = WeaponState.Reloading;
+            f_ReloadTimer = ReloadTimer_Max;
+        }
+    }
+
+    // Energy Weapons
+    protected float MaxEnergyInSeconds;
+    protected float CurrentEnergyInSeconds;
+    public void ReloadEnergy()
+    {
+        if(CurrentEnergyInSeconds < MaxEnergyInSeconds && WeaponState != WeaponState.Reloading)
+        {
+            WeaponState = WeaponState.Reloading;
+
             f_ReloadTimer = ReloadTimer_Max;
         }
     }
