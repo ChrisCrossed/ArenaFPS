@@ -144,6 +144,9 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
         // Tell each weapon what their patch data is
         DispenseWeaponInformation();
+
+        // Disable all weapons for initial run
+        DisableAllPrimaryGuns();
     }
 
     void DispenseWeaponInformation()
@@ -162,6 +165,22 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         WeaponList tempWeapon = PreviousWeapon;
         PreviousWeapon = CurrentWeapon;
         CurrentWeapon = tempWeapon;
+    }
+
+    void DisableAllPrimaryGuns()
+    {
+        // Set 'Current Weapon' to none for startup
+        CurrentWeapon = WeaponList.None;
+
+        // Run through all weapons and disable them
+        shotgun.MoveToInitialPosition();
+        staticGun.MoveToInitialPosition();
+        
+        // Enable the shotgun
+        SetNextGun(WeaponList.Shotgun);
+
+        // Set CurrentWeaponState to 'waiting'
+        ReadyForNextWeapon();
     }
 
     public WeaponList Weapon
@@ -231,7 +250,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         print("Current gun: " + CurrentWeapon.ToString());
 
         // Set CurrentWeaponState to 'waiting
-        currentWeaponState = CurrentWeaponState.WaitingForResponse;
+        currentWeaponState = CurrentWeaponState.WeaponInUse;
     }
 
     public void ReadyForNextWeapon()

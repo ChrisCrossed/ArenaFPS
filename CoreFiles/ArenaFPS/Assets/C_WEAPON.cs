@@ -81,6 +81,17 @@ public class C_WEAPON : MonoBehaviour
         }
     }
 
+    public void MoveToInitialPosition()
+    {
+        // Set physical position
+        Vector3 v3_Rot = go_WeaponModel.transform.localEulerAngles;
+        v3_Rot.x = f_WeaponDisableRotation;
+        go_WeaponModel.transform.localEulerAngles = v3_Rot;
+
+        // Set Weapon State
+        go_WeaponModel.SetActive(false);
+    }
+
     // Used by the Weapon Manager
     public void ReloadGun()
     {
@@ -105,6 +116,12 @@ public class C_WEAPON : MonoBehaviour
         Vector3 v3_Rot = go_WeaponModel.transform.localEulerAngles;
         v3_Rot.x = f_Perc_ * f_WeaponDisableRotation;
         go_WeaponModel.transform.localEulerAngles = v3_Rot;
+
+        if (f_Perc_ == 1.0f) go_WeaponModel.SetActive(false);
+        else if (f_Perc_ < 1.0f)
+        {
+            go_WeaponModel.SetActive(true);
+        }
     }
 
     public void Update()
