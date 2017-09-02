@@ -5,7 +5,11 @@ using UnityEngine;
 public class C_WEAPON : MonoBehaviour
 {
     #region Patch Settings
+    // Reload time
     protected float f_ReloadTimer;
+    protected float ReloadTimer_Max;
+
+    // Fire delay (between shots)
     protected float f_FireDelay;
 
     #endregion
@@ -42,8 +46,8 @@ public class C_WEAPON : MonoBehaviour
     }
 
     protected float f_WeaponState_Timer;
-    protected float f_WeaponState_Timer_Max = 1.0f;
-    protected float f_WeaponDisableRotation = 60f;
+    protected float f_WeaponState_Timer_Max = 0.25f;
+    protected float f_WeaponDisableRotation = 30f;
     public void SetWeaponState(WeaponState weaponState_)
     {
         if (weaponState_ == WeaponState.Enable)
@@ -61,7 +65,7 @@ public class C_WEAPON : MonoBehaviour
     // Number of shells before reloading
     protected int i_ShotsInMagazine;
     protected int i_ShotsInMagazine_Max;
-    virtual public void Reload() // Child uses 'public override void Reload()' with 'base.Reload()'`
+    virtual public void Reload() // Child uses 'public override void Reload()' with 'base.Reload()'
     {
         // Reduce timer
         if (f_ReloadTimer > 0)
@@ -76,11 +80,28 @@ public class C_WEAPON : MonoBehaviour
             }
         }
     }
-    
+
+    // Used by the Weapon Manager
+    public void ReloadGun()
+    {
+        if (i_ShotsInMagazine < i_ShotsInMagazine_Max && WeaponState != WeaponState.Reloading)
+        {
+            WeaponState = WeaponState.Reloading;
+            f_ReloadTimer = ReloadTimer_Max;
+        }
+    }
+
     // Weapon Model
     protected GameObject go_WeaponModel;
     void UpdateWeaponPosition(float f_Perc_)
     {
+        if (go_WeaponModel == null)
+        {
+            print("Weapon Model is Empty");
+
+            return;
+        }
+
         Vector3 v3_Rot = go_WeaponModel.transform.localEulerAngles;
         v3_Rot.x = f_Perc_ * f_WeaponDisableRotation;
         go_WeaponModel.transform.localEulerAngles = v3_Rot;

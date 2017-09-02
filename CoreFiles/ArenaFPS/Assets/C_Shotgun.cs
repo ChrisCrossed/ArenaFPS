@@ -28,8 +28,6 @@ public class C_Shotgun : C_WEAPON
     // Minimum time required between shots
     float f_FireDelay_Max;
 
-    // Reload time
-    float ReloadTimer_Max;
     #endregion
     
     // Pellet connection
@@ -110,6 +108,7 @@ public class C_Shotgun : C_WEAPON
         }
     }
     
+    // Used by the Weapon Class
     public override void Reload()
     {
         // Done because parent is 'virtual public void Reload()'
@@ -143,14 +142,5 @@ public class C_Shotgun : C_WEAPON
 
         // Apply rotation
         go_PivotBall.transform.localEulerAngles = v3_PivotBallRot;
-    }
-
-    public void ReloadGun()
-    {
-        if( i_ShotsInMagazine < i_ShotsInMagazine_Max && WeaponState != WeaponState.Reloading )
-        {
-            WeaponState = WeaponState.Reloading;
-            f_ReloadTimer = ReloadTimer_Max;
-        }
     }
 }

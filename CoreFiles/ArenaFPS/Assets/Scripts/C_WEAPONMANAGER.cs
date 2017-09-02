@@ -55,6 +55,37 @@ public class SHOTGUN_PATCH_DATA
     }
 }
 
+public class STATICGUN_PATCH_DATA
+{
+    // Performs 1% of health each 
+    public float DamagePerSecond
+    {
+        get { return 1.05f; }
+    }
+
+    public float SlowPercent
+    {
+        get { return 0.75f; }
+    }
+
+    // Set to remove 60% of max energy over one full 'magazine'
+    public float JetpackDrainRate
+    {
+        get { return 0.6f; }
+    }
+
+    // Length of time the gun can fire
+    public float MaxEnergyInSeconds
+    {
+        get { return 5.0f; }
+    }
+
+    public float ReloadTimer_Max
+    {
+        get { return 1.0f; }
+    }
+}
+
 public class C_WEAPONMANAGER : C_INPUT_MANAGER
 {
     enum CurrentWeaponState
@@ -78,12 +109,14 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
     // Weapon Connections
     C_Shotgun shotgun;
+    C_StaticGun staticGun;
 
     // Determine Team Color
     TeamColor teamColor;
 
     #region Patch Data
     SHOTGUN_PATCH_DATA shotgunData;
+    STATICGUN_PATCH_DATA staticgunData;
     #endregion
 
     // Use this for initialization
@@ -107,6 +140,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
         // Connections
         shotgun = this_WeaponObject.GetComponent<C_Shotgun>();
+        staticGun = this_WeaponObject.GetComponent<C_StaticGun>();
 
         // Tell each weapon what their patch data is
         DispenseWeaponInformation();
@@ -116,9 +150,11 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
     {
         // Create Weapon Data
         shotgunData = new SHOTGUN_PATCH_DATA();
+        staticgunData = new STATICGUN_PATCH_DATA();
 
         // Dispense Data
         shotgun.SET_DATA(shotgunData);
+        staticGun.SET_DATA(staticgunData);
     }
 
     void QuickswitchWeapons()
@@ -146,7 +182,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         }
         else if (CurrentWeapon == WeaponList.StaticGun)
         {
-
+            staticGun.FireStaticGun();
         }
     }
 
@@ -158,7 +194,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         }
         else if (CurrentWeapon == WeaponList.StaticGun)
         {
-
+            staticGun.ReloadGun();
         }
     }
 
@@ -178,8 +214,6 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
             return;
         }
 
-        print("Current gun: " + CurrentWeapon.ToString());
-
         // Tell current weapon to change state to 'Disable'
         if(CurrentWeapon == WeaponList.Shotgun)
         {
@@ -187,12 +221,14 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         }
         else if(CurrentWeapon == WeaponList.StaticGun)
         {
-            // staticGun.WeaponState = WeaponState.Disable;
+            staticGun.WeaponState = WeaponState.Disable;
         }
 
         // Set Current Weapon
         PreviousWeapon = CurrentWeapon;
         CurrentWeapon = nextWeapon_;
+
+        print("Current gun: " + CurrentWeapon.ToString());
 
         // Set CurrentWeaponState to 'waiting
         currentWeaponState = CurrentWeaponState.WaitingForResponse;
@@ -215,7 +251,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
             }
             else if(CurrentWeapon == WeaponList.StaticGun)
             {
-                // staticGun.WeaponState = WeaponState.Enable
+                staticGun.WeaponState = WeaponState.Enable;
             }
 
             currentWeaponState = CurrentWeaponState.WeaponInUse;
