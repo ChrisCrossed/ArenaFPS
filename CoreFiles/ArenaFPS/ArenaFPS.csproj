@@ -96,6 +96,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\C_HealthManager.cs" />
     <Compile Include="Assets\C_Shotgun.cs" />
     <Compile Include="Assets\C_ShotgunPellet.cs" />
     <Compile Include="Assets\C_SpawnPoint.cs" />

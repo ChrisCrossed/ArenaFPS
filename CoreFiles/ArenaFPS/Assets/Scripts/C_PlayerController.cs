@@ -331,7 +331,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     }
 
     int i_Health;
-    [SerializeField] int i_Health_Max = 100;
+    [SerializeField] int i_Health_Max = 105;
     int i_Armor;
     [SerializeField] int i_Armor_Max = 75;
     public void ApplyDamage( GameObject go_DamagingPlayer_, int i_DamageAmount_ )
