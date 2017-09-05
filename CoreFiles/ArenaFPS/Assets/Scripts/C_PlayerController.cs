@@ -38,6 +38,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     GameObject go_WeaponObject;
     GameObject go_SystemManager;
     C_SystemManager this_SystemManager;
+    C_HealthManager this_HealthManager;
 
     // Character Movement
     [SerializeField] float f_MaxSpeed = 10.0f;
@@ -68,6 +69,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_WeaponManager = this_GameObject.GetComponent<C_WEAPONMANAGER>();
         go_SystemManager = GameObject.Find("SystemManager");
         this_SystemManager = go_SystemManager.GetComponent<C_SystemManager>();
+        this_HealthManager = this_GameObject.GetComponent<C_HealthManager>();
 
         // Raycast Connections
         RaycastPoints[0] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_0").gameObject;
@@ -348,6 +350,9 @@ public class C_PlayerController : C_INPUT_MANAGER
             i_Armor -= i_DamageToReduce;
             if (i_Armor < 0) i_Armor = 0;
 
+            // Send Armor information to HUD
+            this_HealthManager.SetArmorBar(i_Armor, i_Armor_Max);
+
             i_DamageToApply -= i_DamageToReduce / 2;
         }
 
@@ -356,7 +361,11 @@ public class C_PlayerController : C_INPUT_MANAGER
         {
             KillPlayer();
         }
-        print("Health: " + i_Health + ", Armor: " + i_Armor);
+
+        // Send Health information to HUD
+        this_HealthManager.SetHealthBar(i_Health, i_Health_Max);
+        print("Player: " + gameObject.name +
+            ", Health: " + i_Health + ", Armor: " + i_Armor);
     }
 
     public void SpawnPlayer()
@@ -385,6 +394,9 @@ public class C_PlayerController : C_INPUT_MANAGER
         // Reset health and armor
         i_Health = i_Health_Max;
         i_Armor = 0;
+
+        this_HealthManager.SetHealthBar(1.0f);
+        this_HealthManager.SetArmorBar(0.0f);
     }
 
     float f_DeathTimer;
