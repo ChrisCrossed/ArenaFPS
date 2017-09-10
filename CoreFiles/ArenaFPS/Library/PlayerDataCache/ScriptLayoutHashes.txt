@@ -47,6 +47,7 @@ c63db43c730fa2cbb8ca07de15898cb6 UnityEngine.UI.dll:UnityEngine.UI.Toggle
 f61c0793411f10cf5fbfa1473fef5ef2 UnityEngine.UI.dll:UnityEngine.UI.ToggleGroup
 86d36c43c53541d667100dc90b89cfba UnityEngine.UI.dll:UnityEngine.EventSystems.TouchInputModule
 1b8c02d0aa82fbf036a2b9b2d713eec3 UnityEngine.UI.dll:UnityEngine.UI.VerticalLayoutGroup
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_WEAPON
 a35dc9cca2faebc5f5f1aeb9e8e47bbe UnityEngine.UI.dll:UnityEngine.UI.AspectRatioFitter
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.UI.dll:UnityEngine.EventSystems.BaseInput
 49cd62a578efc0a599b810a2b66cd49c UnityEngine.UI.dll:UnityEngine.UI.Button
@@ -115,10 +116,11 @@ c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.Spa
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_Shotgun
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_SystemManager
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_BallLogic
-05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_WeaponBase
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_StaticGun
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_GoalGuide
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:ProBuilder2.Examples.HueCube
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_BallMovement
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_HealthManager
 16304c3e63d00d2fa37d4710cf0e81ed Assembly-CSharp.dll:.C_SpawnPoint
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.C_GoalTrigger
 e3babd5e271d7756d44970e127f31c0a Assembly-CSharp.dll:.C_GoalLogic

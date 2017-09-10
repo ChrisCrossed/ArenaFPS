@@ -36,8 +36,6 @@ public class C_HealthManager : MonoBehaviour
         PlayerIndex = PlayerController.player;
         TeamColor = PlayerController.TeamColor;
 
-        print(gameObject.name + ", " + PlayerIndex);
-
         // HUD Connections
         if (PlayerIndex == PlayerIndex.One)
             go_HUD = GameObject.Find("HUD_PlayerOne");
@@ -53,8 +51,6 @@ public class C_HealthManager : MonoBehaviour
 
         go_HealthBar_Left = go_Healthbar.transform.Find("HP_1").gameObject;
         HealthBar_Left = go_HealthBar_Left.GetComponent<Image>();
-
-        print(gameObject.name + ", " + HealthBar_Left.name);
 
         go_HealthBar_Center = go_Healthbar.transform.Find("HP_2").gameObject;
         HealthBar_Center = go_HealthBar_Center.GetComponent<Image>();
@@ -105,7 +101,7 @@ public class C_HealthManager : MonoBehaviour
 
     public void SetArmorBar(int currArmor_, int maxArmor_)
     {
-        SetArmorBar(currArmor_ / maxArmor_);
+        SetArmorBar( (float)currArmor_ / (float)maxArmor_);
     }
     public void SetArmorBar(float percent_)
     {

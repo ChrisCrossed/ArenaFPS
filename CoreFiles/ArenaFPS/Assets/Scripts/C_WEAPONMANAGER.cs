@@ -247,8 +247,6 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         PreviousWeapon = CurrentWeapon;
         CurrentWeapon = nextWeapon_;
 
-        print("Current gun: " + CurrentWeapon.ToString());
-
         // Set CurrentWeaponState to 'waiting
         currentWeaponState = CurrentWeaponState.WeaponInUse;
     }
@@ -256,7 +254,6 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
     public void ReadyForNextWeapon()
     {
         currentWeaponState = CurrentWeaponState.ResponseReceived;
-        print("READY FOR NEXT WEAPON");
     }
 
     private void Update()

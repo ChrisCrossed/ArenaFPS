@@ -57,7 +57,9 @@ public class C_Shotgun : C_WEAPON
         // Connect to pivot for reloading
         go_WeaponModel = transform.Find("mdl_Shotgun").gameObject;
         go_PivotBall = go_WeaponModel.transform.Find("PivotBall").gameObject;
+        
     }
+
     
     public void FireShotgun(TeamColor teamColor_)
     {
@@ -72,9 +74,8 @@ public class C_Shotgun : C_WEAPON
             {
                 GameObject go_Pellet_ = Instantiate(go_Bullet);
 
-                Transform projectilePoint = transform.Find("mdl_Shotgun").transform.Find("ProjectilePoint");
-                go_Pellet_.transform.position = projectilePoint.position;
-                go_Pellet_.transform.rotation = projectilePoint.rotation;
+                go_Pellet_.transform.position = ProjectilePoint.position;
+                go_Pellet_.transform.rotation = ProjectilePoint.rotation;
                 go_Pellet_.transform.SetParent(GameObject.Find("Bullet Container").transform);
 
                 #region Set Bullet Color
@@ -92,7 +93,7 @@ public class C_Shotgun : C_WEAPON
                 go_Pellet_.GetComponent<TrailRenderer>().materials = mat_;
                 #endregion
 
-                go_Pellet_.GetComponent<C_ShotgunPellet>().SpawnBullet( PelletSpeed, t_Player.gameObject, projectilePoint.gameObject, teamColor_, DamagePerPellet, PelletSpread );
+                go_Pellet_.GetComponent<C_ShotgunPellet>().SpawnBullet( PelletSpeed, t_Player.gameObject, ProjectilePoint.gameObject, teamColor_, DamagePerPellet, PelletSpread );
             }
 
             // Reset delay until next shot

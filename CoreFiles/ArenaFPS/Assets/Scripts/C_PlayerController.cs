@@ -85,14 +85,14 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Set Layer according to team
         TeamColor = teamColor;
-
-        // Spawn Player
-        SpawnPlayer();
         
         // Initialize playerInput_Old
         playerInput_Old = new PlayerInput();
 
         base.Start();
+
+        // Spawn Player
+        // SpawnPlayer();
 	}
 
     public TeamColor TeamColor
@@ -368,6 +368,7 @@ public class C_PlayerController : C_INPUT_MANAGER
             ", Health: " + i_Health + ", Armor: " + i_Armor);
     }
 
+    // Consider changing to a coroutine
     public void SpawnPlayer()
     {
         b_IsDead = false;
@@ -379,6 +380,8 @@ public class C_PlayerController : C_INPUT_MANAGER
         gameObject.GetComponent<MeshRenderer>().enabled = true;
 
         GameObject spawnPoint = this_SystemManager.PlayerRequestsSpawn(TeamColor);
+
+        print("Spawn Point: " + spawnPoint.name);
 
         // Set Position and Rotation
         this_GameObject.transform.position = spawnPoint.transform.position;
@@ -393,10 +396,10 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Reset health and armor
         i_Health = i_Health_Max;
-        i_Armor = 0;
+        i_Armor = i_Armor_Max / 2;
 
         this_HealthManager.SetHealthBar(1.0f);
-        this_HealthManager.SetArmorBar(0.0f);
+        this_HealthManager.SetArmorBar(i_Armor, i_Armor_Max);
     }
 
     float f_DeathTimer;

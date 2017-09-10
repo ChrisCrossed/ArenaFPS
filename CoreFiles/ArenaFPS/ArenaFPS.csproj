@@ -102,6 +102,7 @@
     <Compile Include="Assets\C_SpawnPoint.cs" />
     <Compile Include="Assets\C_StaticGun.cs" />
     <Compile Include="Assets\C_WEAPON.cs" />
+    <Compile Include="Assets\C_WeaponModelManager.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />

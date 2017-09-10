@@ -21,11 +21,24 @@ public class C_WEAPON : MonoBehaviour
     // Store player who fired
     protected Transform t_Player;
 
+    // Projectile Point
+    protected Transform ProjectilePoint;
+
     // Use this for initialization
     void Start ()
     {
         t_Player = transform.parent.transform.parent;
         WeaponManager = t_Player.GetComponent<C_WEAPONMANAGER>();
+
+        SetProjectilePoint();
+    }
+
+    void SetProjectilePoint()
+    {
+        // Get Parent (Camera)
+        Transform ParentCamera = gameObject.transform.parent;
+        
+        ProjectilePoint = ParentCamera.transform.Find("RaycastObjects").transform.Find("ProjectilePoint");
     }
 
     public WeaponState WeaponState
