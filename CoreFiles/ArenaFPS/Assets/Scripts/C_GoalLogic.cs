@@ -18,8 +18,8 @@ public class C_GoalLogic : MonoBehaviour
     C_SystemManager SystemManager;
 
     // Object Connections
-    GameObject go_BallSpawn;
-    C_BallLogic BallLogic;
+    // GameObject go_BallSpawn;
+    // C_BallLogic BallLogic;
     GameObject playerBlocker;
 
     // Receive Values for Entry Goal vs. Shot Goal
@@ -35,8 +35,8 @@ public class C_GoalLogic : MonoBehaviour
 
         if(GameObject.Find("BallSpawn"))
         {
-            go_BallSpawn = GameObject.Find("BallSpawn");
-            BallLogic = go_BallSpawn.GetComponent<C_BallLogic>();
+            // go_BallSpawn = GameObject.Find("BallSpawn");
+            // BallLogic = go_BallSpawn.GetComponent<C_BallLogic>();
         }
 
         if (transform.Find("Blocker"))

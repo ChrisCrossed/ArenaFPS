@@ -102,7 +102,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
     // Set Default weapon
     [SerializeField] WeaponList CurrentWeapon = WeaponList.Shotgun;
-    [SerializeField] WeaponList PreviousWeapon = WeaponList.None;
+    [SerializeField] WeaponList PrevWeapon;
 
     // Weapons Parent Object
     Transform this_WeaponObject;
@@ -119,13 +119,19 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
     STATICGUN_PATCH_DATA staticgunData;
     #endregion
 
-    // Use this for initialization
-    new void Start()
-    {
-        base.Start();
+    // Weapon HUD
+    GameObject WeaponHUD;
+    GameObject WeaponHUD_Background;
+    GameObject[] WeaponHUD_SelectIcons;
+    GameObject[] WeaponHUD_WeaponIcons;
+    Image Background;
+    Image[] SelectIcons;
+    Image[] WeaponIcons;
 
+    private void Awake()
+    {
         // Bullet Container
-        if(!GameObject.Find("Bullet Container"))
+        if (!GameObject.Find("Bullet Container"))
         {
             GameObject bulletContainer = new GameObject();
             bulletContainer.name = "Bullet Container";
@@ -141,12 +147,60 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         // Connections
         shotgun = this_WeaponObject.GetComponent<C_Shotgun>();
         staticGun = this_WeaponObject.GetComponent<C_StaticGun>();
+    }
+
+    // Use this for initialization
+    new void Start()
+    {
+        base.Start();
 
         // Tell each weapon what their patch data is
         DispenseWeaponInformation();
 
         // Disable all weapons for initial run
         DisableAllPrimaryGuns();
+
+        // Set up HUD Icons
+        InitializeHUD();
+    }
+
+    GameObject PlayerHUD;
+    void InitializeHUD()
+    {
+        // Set correct HUD
+        if (player == XInputDotNetPure.PlayerIndex.One)
+            PlayerHUD = GameObject.Find("HUD_PlayerOne");
+        else if (player == XInputDotNetPure.PlayerIndex.Two)
+            PlayerHUD = GameObject.Find("HUD_PlayerTwo");
+        else if (player == XInputDotNetPure.PlayerIndex.Three)
+            PlayerHUD = GameObject.Find("HUD_PlayerThree");
+        else
+            PlayerHUD = GameObject.Find("HUD_PlayerFour");
+
+        // WeaponHUD Connections
+        WeaponHUD = PlayerHUD.transform.Find("WeaponWheel").gameObject;
+        WeaponHUD_SelectIcons = new GameObject[8];
+        WeaponHUD_WeaponIcons = new GameObject[8];
+        SelectIcons = new Image[WeaponHUD_SelectIcons.Length];
+        WeaponIcons = new Image[WeaponHUD_WeaponIcons.Length];
+
+        // Set WeaponHUD Connections
+        WeaponHUD_Background = WeaponHUD.transform.Find("Background").gameObject;
+        Background = WeaponHUD_Background.GetComponent<Image>();
+        for (int i = 0; i < 8; ++i)
+        {
+            WeaponHUD_SelectIcons[i] = WeaponHUD.transform.Find("Select_" + i).gameObject;
+            SelectIcons[i] = WeaponHUD_SelectIcons[i].GetComponent<Image>();
+
+            // TEMPORARY - CHANGE WHEN ALL WEAPONS EXIST
+            if (!(i == 0 || i == 3)) continue;
+
+            WeaponHUD_WeaponIcons[i] = WeaponHUD.transform.Find("Weapon_" + i).gameObject;
+            WeaponIcons[i] = WeaponHUD_WeaponIcons[i].GetComponent<Image>();
+        }
+
+        // Set current transparency
+        SetHUDBackgroundTransparency(0.4f);
     }
 
     void DispenseWeaponInformation()
@@ -160,24 +214,20 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         staticGun.SET_DATA(staticgunData);
     }
 
-    void QuickswitchWeapons()
+    public void QuickswitchWeapons()
     {
-        WeaponList tempWeapon = PreviousWeapon;
-        PreviousWeapon = CurrentWeapon;
-        CurrentWeapon = tempWeapon;
+        // Move to new weapon
+        SetNextGun(PreviousWeapon);
     }
 
     void DisableAllPrimaryGuns()
     {
         // Set 'Current Weapon' to none for startup
-        CurrentWeapon = WeaponList.None;
+        // PreviousWeapon = WeaponList.None;
 
         // Run through all weapons and disable them
         shotgun.MoveToInitialPosition();
         staticGun.MoveToInitialPosition();
-        
-        // Enable the shotgun
-        SetNextGun(WeaponList.Shotgun);
 
         // Set CurrentWeaponState to 'waiting'
         ReadyForNextWeapon();
@@ -187,10 +237,14 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
     {
         set
         {
-            PreviousWeapon = CurrentWeapon;
+            PrevWeapon = CurrentWeapon;
             CurrentWeapon = value;
         }
-        get { return PreviousWeapon; }
+        get { return CurrentWeapon; }
+    }
+    public WeaponList PreviousWeapon
+    {
+        get { return PrevWeapon; }
     }
     
     public void FireGun()
@@ -244,7 +298,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         }
 
         // Set Current Weapon
-        PreviousWeapon = CurrentWeapon;
+        PrevWeapon = CurrentWeapon;
         CurrentWeapon = nextWeapon_;
 
         // Set CurrentWeaponState to 'waiting
@@ -256,8 +310,48 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         currentWeaponState = CurrentWeaponState.ResponseReceived;
     }
 
+    float TransparencyHalf = 0.5f;
+    float TransparencyOff = 1.0f;
+    public bool WeaponHUDState
+    {
+        set;
+        get;
+    }
+
+    public void WeaponHUDSetWeaponActive(int weaponNumber_, bool setActive_)
+    {
+
+    }
+
+    public void WeaponHUDChoice(int weaponNumber_)
+    {
+        Color clr_;
+        for(int i_ = 0; i_ < 8; ++i_)
+        {
+            clr_ = SelectIcons[i_].color;
+
+            if (i_ == weaponNumber_) clr_.a += Time.deltaTime * 10f;
+            else clr_.a -= Time.deltaTime * 10f;
+
+            if (clr_.a > 1.0f) clr_.a = 1.0f;
+            else if (clr_.a < 0) clr_.a = 0f;
+
+            SelectIcons[i_].color = clr_;
+        }
+    }
+
+    void SetHUDBackgroundTransparency(float transparency_)
+    {
+        Color clr_ = Background.color;
+        clr_.a = transparency_;
+        Background.color = clr_;
+    }
+
+    float f_TestTimer;
+    int count;
     private void Update()
     {
+        // Current Weapon Listener
         if(currentWeaponState == CurrentWeaponState.ResponseReceived)
         {
             // Activate next weapon
@@ -273,10 +367,22 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
             currentWeaponState = CurrentWeaponState.WeaponInUse;
         }
 
-        // TEST
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        // Weapon HUD Wheel
+        if(WeaponHUDState)
         {
-            ReadyForNextWeapon();
+            // Fade in HUD
+            // GetWeaponHUD
         }
+
+        f_TestTimer += Time.deltaTime;
+        if (f_TestTimer > 0.15f)
+        {
+            f_TestTimer = 0f;
+
+            ++count;
+            if (count >= 10) count = 0;
+        }
+
+        WeaponHUDChoice(count);
     }
 }

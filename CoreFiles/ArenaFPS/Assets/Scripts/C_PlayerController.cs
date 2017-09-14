@@ -54,8 +54,7 @@ public class C_PlayerController : C_INPUT_MANAGER
 
     [SerializeField] TeamColor teamColor = TeamColor.Red;
 
-	// Use this for initialization
-	new void Start ()
+    private void Awake()
     {
         // Connections
         this_GameObject = gameObject;
@@ -70,7 +69,11 @@ public class C_PlayerController : C_INPUT_MANAGER
         go_SystemManager = GameObject.Find("SystemManager");
         this_SystemManager = go_SystemManager.GetComponent<C_SystemManager>();
         this_HealthManager = this_GameObject.GetComponent<C_HealthManager>();
+    }
 
+    // Use this for initialization
+    new void Start ()
+    {
         // Raycast Connections
         RaycastPoints[0] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_0").gameObject;
         RaycastPoints[1] = this_GameObject.transform.Find("RaycastPoints").transform.Find("RaycastPoint_1").gameObject;
@@ -251,7 +254,6 @@ public class C_PlayerController : C_INPUT_MANAGER
     }
 
     float f_VertAngle;
-    float f_VertAngle_Old;
     void CameraInput()
     {
         // Rotate player based on Right Stick
@@ -265,7 +267,6 @@ public class C_PlayerController : C_INPUT_MANAGER
         if (b_InvertedCamera) playerInput.LookVert *= -1f;
         f_VertAngle -= playerInput.LookVert * f_CameraRot;
         f_VertAngle = Mathf.Clamp(f_VertAngle, -89f, 89f);
-        f_VertAngle_Old = f_VertAngle;
 
         Vector3 v3_CamEuler = this_CameraObject.transform.eulerAngles;
         v3_CamEuler.x = f_VertAngle;
@@ -274,7 +275,6 @@ public class C_PlayerController : C_INPUT_MANAGER
 
     C_WallrunColliderLogic colliderBot;
     C_WallrunColliderLogic colliderTop;
-    bool b_IsWallrun;
     void CaptureWallrunColliders()
     {
         // If top and bottom colliders are touching the same wallrun, override velocity
@@ -283,13 +283,9 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         if (go_Top == null) return;
         if (go_Bot == null) return;
-
-        b_IsWallrun = false;
-
+        
         if(go_Bot == go_Top)
         {
-            b_IsWallrun = true;
-
             Vector3 v3_Velocity = this_RigidBody.velocity;
             v3_Velocity.y = 0f;
 
@@ -372,7 +368,12 @@ public class C_PlayerController : C_INPUT_MANAGER
     public void SpawnPlayer()
     {
         b_IsDead = false;
-        
+
+        // Set player weapons
+        this_WeaponManager.ReadyForNextWeapon();
+        this_WeaponManager.Weapon = WeaponList.StaticGun;   // Previous
+        this_WeaponManager.Weapon = WeaponList.Shotgun;  // Current
+
         // Turn off player collider
         gameObject.GetComponent<Collider>().enabled = true;
 
@@ -380,8 +381,6 @@ public class C_PlayerController : C_INPUT_MANAGER
         gameObject.GetComponent<MeshRenderer>().enabled = true;
 
         GameObject spawnPoint = this_SystemManager.PlayerRequestsSpawn(TeamColor);
-
-        print("Spawn Point: " + spawnPoint.name);
 
         // Set Position and Rotation
         this_GameObject.transform.position = spawnPoint.transform.position;
@@ -470,6 +469,8 @@ public class C_PlayerController : C_INPUT_MANAGER
     }
 
     // Update is called once per frame
+    float BumperHeldTimer;
+    static float BumperHeldTimerThreshhold = 0.25f;
     void Update ()
     {
         base.UpdatePlayerInput();
@@ -477,6 +478,33 @@ public class C_PlayerController : C_INPUT_MANAGER
         if (playerInput.Trigger_Right == XInputDotNetPure.ButtonState.Pressed)
         {
             this_WeaponManager.FireGun();
+        }
+
+        // If left or right bumper is tapped (not held), quickswitch weapons
+        if(playerInput.Bumper_Left == XInputDotNetPure.ButtonState.Pressed || playerInput.Bumper_Right == XInputDotNetPure.ButtonState.Pressed)
+        {
+            BumperHeldTimer += Time.deltaTime;
+
+            if(BumperHeldTimer > BumperHeldTimerThreshhold)
+            {
+                // Show Weapon Menu
+                print("WEAPON MENU");
+            }
+        }
+        else if(BumperHeldTimer > 0f)
+        {
+            // if button is released before the threshhold, perform a quickswitch
+            if(BumperHeldTimer < BumperHeldTimerThreshhold)
+            {
+                // Weapon Quickswitch
+                if(this_WeaponManager.PreviousWeapon != WeaponList.None)
+                    this_WeaponManager.QuickswitchWeapons();
+
+                print("QUICKSWITCH");
+            }
+
+            // Reset timer
+            BumperHeldTimer = 0f;
         }
 
         if(f_DeathTimer > 0f)
@@ -487,15 +515,6 @@ public class C_PlayerController : C_INPUT_MANAGER
                 f_DeathTimer = 0;
                 SpawnPlayer();
             }
-        }
-
-        if(Input.GetKeyDown(KeyCode.O))
-        {
-            this_WeaponManager.SetNextGun(WeaponList.Shotgun);
-        }
-        else if(Input.GetKeyDown(KeyCode.P))
-        {
-            this_WeaponManager.SetNextGun(WeaponList.StaticGun);
         }
         
         if (Input.GetKeyDown(KeyCode.Escape) || playerInput.Button_Start == XInputDotNetPure.ButtonState.Pressed)

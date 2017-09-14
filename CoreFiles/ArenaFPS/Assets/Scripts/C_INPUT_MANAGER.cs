@@ -188,6 +188,9 @@ public class C_INPUT_MANAGER : MonoBehaviour
         // Controller input
         v2_DPad = new Vector2();
         v2_DPad_Old = new Vector2();
+
+        // Move weapon models (Run here due to Start() order and used in child class)
+        MoveWeaponModels();
     }
 
     public PlayerIndex SetPlayerIndex
@@ -295,6 +298,18 @@ public class C_INPUT_MANAGER : MonoBehaviour
         else playerInput.Trigger_Right = ButtonState.Released;
         #endregion
 
+        #region Bumpers
+        if (player_State.Buttons.LeftShoulder == ButtonState.Pressed)
+            playerInput.Bumper_Left = ButtonState.Pressed;
+        else
+            playerInput.Bumper_Left = ButtonState.Released;
+
+        if (player_State.Buttons.RightShoulder == ButtonState.Pressed)
+            playerInput.Bumper_Right = ButtonState.Pressed;
+        else
+            playerInput.Bumper_Right = ButtonState.Released;
+        #endregion
+
         #region Start & Select
         if (player_State.Buttons.Start == ButtonState.Pressed) playerInput.Button_Start = ButtonState.Pressed;
         else playerInput.Button_Start = ButtonState.Released;
@@ -304,5 +319,35 @@ public class C_INPUT_MANAGER : MonoBehaviour
         #endregion
 
         player_PrevState = player_State;
+    }
+    
+    GameObject weaponHUD;
+    protected void MoveWeaponModels()
+    {
+        // Get local position
+        Vector3 localPosition = gameObject.transform.localPosition;
+        Quaternion localRotation = gameObject.transform.localRotation;
+
+        // Change transform to new Camera model
+
+        if (player == XInputDotNetPure.PlayerIndex.One)
+            weaponHUD = GameObject.Find("WeaponHUD_PlayerOne");
+        else if (player == XInputDotNetPure.PlayerIndex.Two)
+            weaponHUD = GameObject.Find("WeaponHUD_PlayerTwo");
+        else if (player == XInputDotNetPure.PlayerIndex.Three)
+            weaponHUD = GameObject.Find("WeaponHUD_PlayerThree");
+        else
+            weaponHUD = GameObject.Find("WeaponHUD_PlayerFour");
+
+        gameObject.transform.SetParent(weaponHUD.transform);
+
+        // Set local position
+        gameObject.transform.localPosition = localPosition;
+        gameObject.transform.localRotation = localRotation;
+    }
+
+    protected GameObject GetWeaponHUD
+    {
+        get { return weaponHUD; }
     }
 }

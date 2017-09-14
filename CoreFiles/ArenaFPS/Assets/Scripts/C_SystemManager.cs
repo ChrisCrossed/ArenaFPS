@@ -149,8 +149,6 @@ public class C_SystemManager : MonoBehaviour
 
     public GameObject PlayerRequestsSpawn( TeamColor teamColor_ )
     {
-        print(SpawnPositions_Red.Count);
-
         // Storage for the final spawn position
         GameObject go_SpawnPosition_ = null;
 
@@ -182,8 +180,6 @@ public class C_SystemManager : MonoBehaviour
                 go_SpawnPosition_ = spawnPoint;
             }
         }
-
-        print("Passing: " + go_SpawnPosition_.name);
 
         // Return the position we found
         return go_SpawnPosition_;

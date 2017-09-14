@@ -10,6 +10,8 @@ public class C_WeaponModelManager : C_INPUT_MANAGER
         MoveShotgunRaycasters();
     }
 
+    
+
     // Move Shotgun Raycast Data
     void MoveShotgunRaycasters()
     {
@@ -24,11 +26,9 @@ public class C_WeaponModelManager : C_INPUT_MANAGER
 
         // Find parent object (Moving up a layer)
         Transform RaycastObjectsParent = transform.parent;
-        print("Moved to: " + RaycastObjectsParent.name);
 
         // Move down one layer to RaycastObjects
         Transform RaycastObjects = RaycastObjectsParent.Find("RaycastObjects");
-        print("Moved to: " + RaycastObjects.name);
 
         // Move to proper position
         ShotgunProjectilePoint.SetParent(RaycastObjects);
@@ -40,44 +40,5 @@ public class C_WeaponModelManager : C_INPUT_MANAGER
 
         ShotgunWeaponRaycastPoint.transform.position = ShotgunWeaponRaycastPointPosition;
         ShotgunWeaponRaycastPoint.transform.eulerAngles = ShotgunWeaponRaycastPointEulers;
-    }
-
-    void MoveWeaponModels()
-    {
-        // Get local position
-        Vector3 localPosition = gameObject.transform.localPosition;
-        Quaternion localRotation = gameObject.transform.localRotation;
-
-        // Change transform to new Camera model
-        GameObject weaponHUD;
-        if (player == XInputDotNetPure.PlayerIndex.One)
-            weaponHUD = GameObject.Find("WeaponHUD_PlayerOne");
-        else if(player == XInputDotNetPure.PlayerIndex.Two)
-            weaponHUD = GameObject.Find("WeaponHUD_PlayerTwo");
-        else if(player == XInputDotNetPure.PlayerIndex.Three)
-            weaponHUD = GameObject.Find("WeaponHUD_PlayerThree");
-        else
-            weaponHUD = GameObject.Find("WeaponHUD_PlayerFour");
-
-        gameObject.transform.SetParent(weaponHUD.transform);
-
-        // Set local position
-        gameObject.transform.localPosition = localPosition;
-        gameObject.transform.localRotation = localRotation;
-    }
-
-    float WaitTimer;
-    private void Update()
-    {
-        if(WaitTimer < 0.05f)
-        {
-            WaitTimer += Time.deltaTime;
-
-            if(WaitTimer > 0.05f)
-            {
-                // Move remaining weapons
-                MoveWeaponModels();
-            }
-        }
     }
 }

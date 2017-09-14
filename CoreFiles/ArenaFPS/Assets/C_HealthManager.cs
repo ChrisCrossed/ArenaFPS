@@ -9,7 +9,7 @@ public class C_HealthManager : MonoBehaviour
     // Player & Team Connections
     C_PlayerController PlayerController;
     PlayerIndex PlayerIndex;
-    TeamColor TeamColor;
+    // TeamColor TeamColor;
 
     // HUD Connections
     GameObject go_HUD;
@@ -34,7 +34,7 @@ public class C_HealthManager : MonoBehaviour
         // Set Player Index
         PlayerController = gameObject.GetComponent<C_PlayerController>();
         PlayerIndex = PlayerController.player;
-        TeamColor = PlayerController.TeamColor;
+        // TeamColor = PlayerController.TeamColor;
 
         // HUD Connections
         if (PlayerIndex == PlayerIndex.One)
