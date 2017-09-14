@@ -92,7 +92,7 @@ public class C_PlayerController : C_INPUT_MANAGER
         base.Start();
 
         // Spawn Player
-        // SpawnPlayer();
+        SpawnPlayer();
 	}
 
     public TeamColor TeamColor
