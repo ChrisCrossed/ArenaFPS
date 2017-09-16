@@ -256,6 +256,9 @@ public class C_PlayerController : C_INPUT_MANAGER
     float f_VertAngle;
     void CameraInput()
     {
+        // If the player is holding down the bumper to select a weapon, don't look around
+        if (BumperHeld) return;
+
         // Rotate player based on Right Stick
         Vector3 v3_PlayerRot = this_GameObject.transform.eulerAngles;
         Vector3 v3_NewRot = v3_PlayerRot;
@@ -374,6 +377,14 @@ public class C_PlayerController : C_INPUT_MANAGER
         this_WeaponManager.Weapon = WeaponList.StaticGun;   // Previous
         this_WeaponManager.Weapon = WeaponList.Shotgun;  // Current
 
+        for (int i_ = 0; i_ < 8; ++i_)
+        {
+            this_WeaponManager.WeaponHUDSetWeaponActive(i_, false);
+        }
+
+        this_WeaponManager.WeaponHUDSetWeaponActive(0, true); // Shotgun
+        this_WeaponManager.WeaponHUDSetWeaponActive(3, true); // Static Gun
+
         // Turn off player collider
         gameObject.GetComponent<Collider>().enabled = true;
 
@@ -399,6 +410,18 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         this_HealthManager.SetHealthBar(1.0f);
         this_HealthManager.SetArmorBar(i_Armor, i_Armor_Max);
+    }
+
+    void SwitchToSelectedWeapon()
+    {
+        // Switch to OWNED weapon
+        if (WeaponChoice == 0)
+            this_WeaponManager.SetNextGun(WeaponList.Shotgun);
+        else if (WeaponChoice == 3)
+            this_WeaponManager.SetNextGun(WeaponList.StaticGun);
+
+        // Reset selection
+        WeaponChoice = -1;
     }
 
     float f_DeathTimer;
@@ -471,7 +494,9 @@ public class C_PlayerController : C_INPUT_MANAGER
     // Update is called once per frame
     float BumperHeldTimer;
     static float BumperHeldTimerThreshhold = 0.25f;
-    void Update ()
+    bool BumperHeld;
+    int WeaponChoice = -1;
+    void Update()
     {
         base.UpdatePlayerInput();
 
@@ -480,32 +505,108 @@ public class C_PlayerController : C_INPUT_MANAGER
             this_WeaponManager.FireGun();
         }
 
+        #region Set Weapon HUD State
+
+        #region HUD Background
+        // Reset WeaponHUDState, just to be safe
+        this_WeaponManager.WeaponHUDState = false;
+
         // If left or right bumper is tapped (not held), quickswitch weapons
-        if(playerInput.Bumper_Left == XInputDotNetPure.ButtonState.Pressed || playerInput.Bumper_Right == XInputDotNetPure.ButtonState.Pressed)
+        if (playerInput.Bumper_Left == XInputDotNetPure.ButtonState.Pressed || playerInput.Bumper_Right == XInputDotNetPure.ButtonState.Pressed)
         {
             BumperHeldTimer += Time.deltaTime;
 
-            if(BumperHeldTimer > BumperHeldTimerThreshhold)
+            if (BumperHeldTimer > BumperHeldTimerThreshhold)
             {
                 // Show Weapon Menu
-                print("WEAPON MENU");
+                this_WeaponManager.WeaponHUDState = true;
             }
         }
-        else if(BumperHeldTimer > 0f)
+        else if (BumperHeldTimer > 0f)
         {
             // if button is released before the threshhold, perform a quickswitch
-            if(BumperHeldTimer < BumperHeldTimerThreshhold)
+            if (BumperHeldTimer < BumperHeldTimerThreshhold)
             {
                 // Weapon Quickswitch
-                if(this_WeaponManager.PreviousWeapon != WeaponList.None)
+                if (this_WeaponManager.PreviousWeapon != WeaponList.None)
                     this_WeaponManager.QuickswitchWeapons();
-
-                print("QUICKSWITCH");
             }
 
             // Reset timer
             BumperHeldTimer = 0f;
         }
+        #endregion
+
+        #region Highlight selected weapon via input
+        // If Bumper is held down, state that.
+        if (playerInput.Bumper_Left == XInputDotNetPure.ButtonState.Pressed || playerInput.Bumper_Right == XInputDotNetPure.ButtonState.Pressed)
+        {
+            if(!BumperHeld)
+            {
+                // Set state
+                BumperHeld = true;
+
+                // Reset Weapon Chosen
+                WeaponChoice = -1;
+            }
+        }
+        // Otherwise, state that the Bumper is not held down, and show no weapon is selected
+        else
+        {
+            // Only run commands if the Bumper used to be held
+            if(!BumperHeld)
+            {
+                // Switch to weapon last selected
+                SwitchToSelectedWeapon();
+            }
+
+            // Release bumper state
+            BumperHeld = false;
+
+            // Reset Weapon icon choice
+            this_WeaponManager.WeaponHUDChoice(-1);
+        }
+
+        if (BumperHeld)
+        {
+            float AnalogStickThreshhold = 0.25f;
+
+            // Left side of right analog stick
+            if(playerInput.LookHoriz < -AnalogStickThreshhold)
+            {
+                if (playerInput.LookVert > AnalogStickThreshhold)
+                    WeaponChoice = 7;
+                else if (playerInput.LookVert < -AnalogStickThreshhold)
+                    WeaponChoice = 5;
+                else
+                    WeaponChoice = 6;
+            }
+            // Right side of Right analog stick
+            else if(playerInput.LookHoriz > AnalogStickThreshhold)
+            {
+                if (playerInput.LookVert > AnalogStickThreshhold)
+                    WeaponChoice = 1;
+                else if (playerInput.LookVert < -AnalogStickThreshhold)
+                    WeaponChoice = 3;
+                else
+                    WeaponChoice = 2;
+            }
+            else
+            {
+                if (playerInput.LookVert > AnalogStickThreshhold)
+                    WeaponChoice = 0;
+                else if (playerInput.LookVert < -AnalogStickThreshhold)
+                    WeaponChoice = 4;
+                else // Unique state. Does not record weapon choice.
+                    this_WeaponManager.WeaponHUDChoice(9);
+            }
+
+            // Sets weapon icon 
+            this_WeaponManager.WeaponHUDChoice(WeaponChoice);
+        }
+        #endregion
+
+        #endregion
 
         if(f_DeathTimer > 0f)
         {

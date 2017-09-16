@@ -147,6 +147,8 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         // Connections
         shotgun = this_WeaponObject.GetComponent<C_Shotgun>();
         staticGun = this_WeaponObject.GetComponent<C_StaticGun>();
+
+        WeaponIconMaxAlpha = new float[8];
     }
 
     // Use this for initialization
@@ -193,14 +195,29 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
             SelectIcons[i] = WeaponHUD_SelectIcons[i].GetComponent<Image>();
 
             // TEMPORARY - CHANGE WHEN ALL WEAPONS EXIST
-            if (!(i == 0 || i == 3)) continue;
+            if (WeaponImplementationTest(i)) continue;
 
             WeaponHUD_WeaponIcons[i] = WeaponHUD.transform.Find("Weapon_" + i).gameObject;
             WeaponIcons[i] = WeaponHUD_WeaponIcons[i].GetComponent<Image>();
         }
 
-        // Set current transparency
-        SetHUDBackgroundTransparency(0.4f);
+        // Turn off HUD Alpha's
+        HUDBackgroundAlpha = 0f;
+
+        // Turn off all selection icons
+        Color clr_;
+        for(int i_ = 0; i_ < 8; ++i_)
+        {
+            if (!(i_ == 0 || i_ == 3)) continue;
+
+            clr_ = WeaponIcons[i_].color;
+            clr_.a = 0f;
+            WeaponIcons[i_].color = clr_;
+        }
+
+        // Set Max Weapon Icon Alpha
+        
+        
     }
 
     void DispenseWeaponInformation()
@@ -222,9 +239,6 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
     void DisableAllPrimaryGuns()
     {
-        // Set 'Current Weapon' to none for startup
-        // PreviousWeapon = WeaponList.None;
-
         // Run through all weapons and disable them
         shotgun.MoveToInitialPosition();
         staticGun.MoveToInitialPosition();
@@ -310,41 +324,104 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         currentWeaponState = CurrentWeaponState.ResponseReceived;
     }
 
-    float TransparencyHalf = 0.5f;
-    float TransparencyOff = 1.0f;
     public bool WeaponHUDState
     {
         set;
         get;
     }
 
+    float TransparencyHalf = 0.3f;
+    float TransparencyOff = 1.0f;
+    float[] WeaponIconMaxAlpha;
     public void WeaponHUDSetWeaponActive(int weaponNumber_, bool setActive_)
     {
+        // TEMPORARY
+        if (WeaponImplementationTest(weaponNumber_)) return;
 
+        print("Weapon " + weaponNumber_ + " is now on: " + setActive_ + " on player " + player);
+
+        if (setActive_)
+            WeaponIconMaxAlpha[weaponNumber_] = TransparencyOff;
+        else
+            WeaponIconMaxAlpha[weaponNumber_] = TransparencyHalf;
     }
 
+    float FadeOutTimer = 0.0f;
+    float FadeOutTimerMax = 2f;
     public void WeaponHUDChoice(int weaponNumber_)
     {
         Color clr_;
         for(int i_ = 0; i_ < 8; ++i_)
         {
+            // Record state of icon color
             clr_ = SelectIcons[i_].color;
 
-            if (i_ == weaponNumber_) clr_.a += Time.deltaTime * 10f;
+            // Don't try and change the alpha of unneeded icons.
+            if ((clr_.a == 0f && i_ != weaponNumber_)) continue; // If this icon doesn't need to be changed, skip it.
+
+            // Selection made, reset Fade Out Timer
+            FadeOutTimer = FadeOutTimerMax;
+
+            // Increase or Decrease transparency
+            if (i_ == weaponNumber_) clr_.a = 1f;
             else clr_.a -= Time.deltaTime * 10f;
 
-            if (clr_.a > 1.0f) clr_.a = 1.0f;
-            else if (clr_.a < 0) clr_.a = 0f;
+            // Cap
+            if (clr_.a < 0) clr_.a = 0f;
 
+            // Set
             SelectIcons[i_].color = clr_;
         }
     }
 
-    void SetHUDBackgroundTransparency(float transparency_)
+    float AlphaLerp;
+    public void ShowWeaponIconAlpha(bool IsActive_ = false)
     {
-        Color clr_ = Background.color;
-        clr_.a = transparency_;
-        Background.color = clr_;
+        // Increase or decrease alpha
+        if (IsActive_ && AlphaLerp < 1.0f)
+        {
+            AlphaLerp += Time.deltaTime * 10f;
+
+            if (AlphaLerp > 1.0f) AlphaLerp = 1.0f;
+        }
+        else if (!IsActive_ && AlphaLerp > 0f)
+        {
+            AlphaLerp -= Time.deltaTime * 10f;
+
+            if (AlphaLerp < 0f) AlphaLerp = 0f;
+        }
+        else return;
+
+        // Set each weapon icon alpha
+        Color clr_;
+        for(int i_ = 0; i_ < 8; ++i_)
+        {
+            if (WeaponImplementationTest(i_)) continue;
+
+            clr_ = WeaponIcons[i_].color;
+            clr_.a = AlphaLerp * WeaponIconMaxAlpha[i_];
+            WeaponIcons[i_].color = clr_;
+        }
+    }
+
+    // Sets the current HUD background alpha channel between 0f and 1f.
+    float BackgroundAlpha;
+    float HUDBackgroundAlpha
+    {
+        // Sets the Background alpha
+        set
+        {
+            BackgroundAlpha = value;
+
+            Color clr_ = Background.color;
+            clr_.a = BackgroundAlpha;
+            Background.color = clr_;
+        }
+        // Returns the Background Alpha
+        get
+        {
+            return BackgroundAlpha;
+        }
     }
 
     float f_TestTimer;
@@ -367,22 +444,56 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
             currentWeaponState = CurrentWeaponState.WeaponInUse;
         }
 
+        // Show Weapon Icons
+        ShowWeaponIconAlpha(WeaponHUDState);
+
         // Weapon HUD Wheel
-        if(WeaponHUDState)
+        if (WeaponHUDState)
         {
-            // Fade in HUD
-            // GetWeaponHUD
-        }
+            #region Set HUD Alpha
+            // If HUD is less than 1.0f, increase
+            if(HUDBackgroundAlpha < 1.0f)
+            {
+                // Temporary float so we're not changing the object a bunch
+                float temp_ = HUDBackgroundAlpha;
 
-        f_TestTimer += Time.deltaTime;
-        if (f_TestTimer > 0.15f)
+                // Fade in HUD
+                temp_ += Time.deltaTime * 10f;
+
+                // Cap
+                if (temp_ > 1.0f) temp_ = 1.0f;
+
+                // Assign
+                HUDBackgroundAlpha = temp_;
+            }
+            #endregion
+        }
+        else
         {
-            f_TestTimer = 0f;
+            if(HUDBackgroundAlpha > 0f)
+            {
+                // Temporary float so we're not changing the object a bunch
+                float temp_ = HUDBackgroundAlpha;
 
-            ++count;
-            if (count >= 10) count = 0;
+                // Fade out HUD
+                temp_ -= Time.deltaTime * 10f;
+
+                // Cap
+                if (temp_ < 0f) temp_ = 0f;
+
+                // Assign
+                HUDBackgroundAlpha = temp_;
+            }
         }
+    }
 
-        WeaponHUDChoice(count);
+    bool WeaponImplementationTest(int i_)
+    {
+        bool CanContinue = false;
+
+        if (i_ == 0) CanContinue = true;
+        else if (i_ == 3) CanContinue = true;
+
+        return !CanContinue;
     }
 }

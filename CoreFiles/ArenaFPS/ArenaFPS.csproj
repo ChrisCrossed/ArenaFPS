@@ -96,13 +96,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\C_HealthManager.cs" />
-    <Compile Include="Assets\C_Shotgun.cs" />
-    <Compile Include="Assets\C_ShotgunPellet.cs" />
-    <Compile Include="Assets\C_SpawnPoint.cs" />
-    <Compile Include="Assets\C_StaticGun.cs" />
-    <Compile Include="Assets\C_WEAPON.cs" />
-    <Compile Include="Assets\C_WeaponModelManager.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
@@ -115,12 +108,19 @@
     <Compile Include="Assets\Scripts\C_GoalGuide.cs" />
     <Compile Include="Assets\Scripts\C_GoalLogic.cs" />
     <Compile Include="Assets\Scripts\C_GoalTrigger.cs" />
+    <Compile Include="Assets\Scripts\C_HealthManager.cs" />
     <Compile Include="Assets\Scripts\C_INPUT_MANAGER.cs" />
     <Compile Include="Assets\Scripts\C_PlayerController.cs" />
     <Compile Include="Assets\Scripts\C_RotatingPieceLogic.cs" />
+    <Compile Include="Assets\Scripts\C_Shotgun.cs" />
+    <Compile Include="Assets\Scripts\C_ShotgunPellet.cs" />
+    <Compile Include="Assets\Scripts\C_SpawnPoint.cs" />
+    <Compile Include="Assets\Scripts\C_StaticGun.cs" />
     <Compile Include="Assets\Scripts\C_SystemManager.cs" />
     <Compile Include="Assets\Scripts\C_WallrunColliderLogic.cs" />
+    <Compile Include="Assets\Scripts\C_WEAPON.cs" />
     <Compile Include="Assets\Scripts\C_WEAPONMANAGER.cs" />
+    <Compile Include="Assets\Scripts\C_WeaponModelManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\README.txt" />
