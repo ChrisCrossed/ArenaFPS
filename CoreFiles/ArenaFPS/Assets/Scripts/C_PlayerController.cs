@@ -339,6 +339,7 @@ public class C_PlayerController : C_INPUT_MANAGER
     {
         int i_DamageToApply = i_DamageAmount_;
 
+        // If the player has any armor remaining...
         if (i_Armor > 0 )
         {
             // Determine if player has more Armor or Damage received
@@ -352,9 +353,11 @@ public class C_PlayerController : C_INPUT_MANAGER
             // Send Armor information to HUD
             this_HealthManager.SetArmorBar(i_Armor, i_Armor_Max);
 
+            // The damage received by the player is equal to HALF of what the armor received.
             i_DamageToApply -= i_DamageToReduce / 2;
         }
 
+        // Apply damage and determine if dead
         i_Health -= i_DamageToApply;
         if(i_Health <= 0)
         {
@@ -366,25 +369,29 @@ public class C_PlayerController : C_INPUT_MANAGER
         print("Player: " + gameObject.name +
             ", Health: " + i_Health + ", Armor: " + i_Armor);
     }
-
-    // Consider changing to a coroutine
-    public void SpawnPlayer()
+    
+    void SpawnPlayer()
     {
+        // Player is no longer dead
         b_IsDead = false;
+
+        #region Weapons
+        // Reset 'Weapons Picked Up' list.
+        WeaponsPickedUp = new bool[8];
+
+        // Turn off all weapon icons
+        for (int i_ = 0; i_ < 8; ++i_)
+            this_WeaponManager.WeaponHUDSetWeaponActive(i_, false);
+
+        // Give the player a shotgun
+        PickWeaponUp(WeaponList.Shotgun);
 
         // Set player weapons
         this_WeaponManager.ReadyForNextWeapon();
-        this_WeaponManager.Weapon = WeaponList.StaticGun;   // Previous
         this_WeaponManager.Weapon = WeaponList.Shotgun;  // Current
+        #endregion
 
-        for (int i_ = 0; i_ < 8; ++i_)
-        {
-            this_WeaponManager.WeaponHUDSetWeaponActive(i_, false);
-        }
-
-        this_WeaponManager.WeaponHUDSetWeaponActive(0, true); // Shotgun
-        this_WeaponManager.WeaponHUDSetWeaponActive(3, true); // Static Gun
-
+        #region Colliders and position
         // Turn off player collider
         gameObject.GetComponent<Collider>().enabled = true;
 
@@ -403,22 +410,43 @@ public class C_PlayerController : C_INPUT_MANAGER
 
         // Reset camera rotation
         f_VertAngle = 0f;
+        #endregion
 
+        #region Health and Armor
         // Reset health and armor
         i_Health = i_Health_Max;
         i_Armor = i_Armor_Max / 2;
 
+        // Reset health (and armor, for now)
         this_HealthManager.SetHealthBar(1.0f);
         this_HealthManager.SetArmorBar(i_Armor, i_Armor_Max);
+        #endregion
     }
 
+    public void PickWeaponUp(WeaponList weapon_)
+    {
+        PickWeaponUp((int)weapon_);
+    }
+    public void PickWeaponUp(int weaponPickedUp_)
+    {
+        // Enable weapon boolean
+        WeaponsPickedUp[weaponPickedUp_] = true;
+
+        // Enable weapon icon
+        this_WeaponManager.WeaponHUDSetWeaponActive(weaponPickedUp_, true);
+    }
+
+    bool[] WeaponsPickedUp;
     void SwitchToSelectedWeapon()
     {
+        // If weapon choice is invalid, return out
+        if (WeaponChoice < 0 || WeaponChoice > 7) return;
+
+        // If weapon is not owned, then just call the weapon already enabled (hacky method, returning doesn't work)
+        if (!WeaponsPickedUp[WeaponChoice]) WeaponChoice = (int)this_WeaponManager.Weapon;
+
         // Switch to OWNED weapon
-        if (WeaponChoice == 0)
-            this_WeaponManager.SetNextGun(WeaponList.Shotgun);
-        else if (WeaponChoice == 3)
-            this_WeaponManager.SetNextGun(WeaponList.StaticGun);
+        this_WeaponManager.SetNextGun((WeaponList)WeaponChoice);
 
         // Reset selection
         WeaponChoice = -1;
@@ -504,6 +532,9 @@ public class C_PlayerController : C_INPUT_MANAGER
         {
             this_WeaponManager.FireGun();
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+            PickWeaponUp(WeaponList.StaticGun);
 
         #region Set Weapon HUD State
 

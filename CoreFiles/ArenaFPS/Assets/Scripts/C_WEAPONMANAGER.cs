@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public enum WeaponList
 {
-    None,
-    Shotgun,
-    StaticGun,
+    None = -1,
+    Shotgun = 0,
+    StaticGun = 3,
 }
 
 public class SHOTGUN_PATCH_DATA
@@ -338,11 +338,10 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         // TEMPORARY
         if (WeaponImplementationTest(weaponNumber_)) return;
 
-        print("Weapon " + weaponNumber_ + " is now on: " + setActive_ + " on player " + player);
-
+        // If the player owns the weapon, the icon has no transparency
         if (setActive_)
             WeaponIconMaxAlpha[weaponNumber_] = TransparencyOff;
-        else
+        else // The weapon isn't owned and is heavily transparent
             WeaponIconMaxAlpha[weaponNumber_] = TransparencyHalf;
     }
 
