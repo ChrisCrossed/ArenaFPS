@@ -93,9 +93,6 @@ public class C_PlayerController : C_INPUT_MANAGER
         playerInput_Old = new PlayerInput();
 
         base.Start();
-
-        // Spawn Player
-        SpawnPlayer();
 	}
 
     public TeamColor TeamColor
@@ -370,12 +367,15 @@ public class C_PlayerController : C_INPUT_MANAGER
             ", Health: " + i_Health + ", Armor: " + i_Armor);
     }
     
-    void SpawnPlayer()
+    public void SpawnPlayer()
     {
         // Player is no longer dead
         b_IsDead = false;
 
         #region Weapons
+        // Reset weapons in Weapon Manager
+        this_WeaponManager.DisableAllPrimaryGuns();
+
         // Reset 'Weapons Picked Up' list.
         WeaponsPickedUp = new bool[8];
 
@@ -429,11 +429,25 @@ public class C_PlayerController : C_INPUT_MANAGER
     }
     public void PickWeaponUp(int weaponPickedUp_)
     {
-        // Enable weapon boolean
-        WeaponsPickedUp[weaponPickedUp_] = true;
+        // If the player doesn't own this weapon, let them pick it up
+        if(!WeaponsPickedUp[weaponPickedUp_])
+        {
+            // Enable weapon boolean
+            WeaponsPickedUp[weaponPickedUp_] = true;
 
-        // Enable weapon icon
-        this_WeaponManager.WeaponHUDSetWeaponActive(weaponPickedUp_, true);
+            // Enable weapon icon
+            this_WeaponManager.WeaponHUDSetWeaponActive(weaponPickedUp_, true);
+        }
+    }
+
+    public bool DoesPlayerOwnWeapon(WeaponList weapon_)
+    {
+        // if the player already has the weapon, return true
+        if(WeaponsPickedUp[(int)weapon_])
+            return true;
+
+        // All other conditions, return false
+        return false;
     }
 
     bool[] WeaponsPickedUp;

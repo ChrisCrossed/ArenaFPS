@@ -27,10 +27,12 @@ public class C_SystemManager : MonoBehaviour
     }
 
     // Use this for initialization
+    private IEnumerator coroutine;
     void Start ()
     {
-		
-	}
+        coroutine = StartGame();
+        StartCoroutine(coroutine);
+    }
 
     public void SetBallState(bool b_IsActive_)
     {
@@ -188,5 +190,25 @@ public class C_SystemManager : MonoBehaviour
     private void LateUpdate()
     {
         ScrapeUnitPositions();
+    }
+
+    private IEnumerator StartGame()
+    {
+        while(true)
+        {
+            // WHY DOES THIS WORK
+            yield return new WaitForSeconds(0);
+
+            // Spawn all Blue Players
+            for (int i_ = 0; i_ < BlueTeam.Count; ++i_)
+                BlueTeam[i_].GetComponent<C_PlayerController>().SpawnPlayer();
+
+            // Spawn all Red Players
+            for (int j_ = 0; j_ < RedTeam.Count; ++j_)
+                RedTeam[j_].GetComponent<C_PlayerController>().SpawnPlayer();
+
+            // Break out
+            break;
+        }
     }
 }

@@ -237,7 +237,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
         SetNextGun(PreviousWeapon);
     }
 
-    void DisableAllPrimaryGuns()
+    public void DisableAllPrimaryGuns()
     {
         // Run through all weapons and disable them
         shotgun.MoveToInitialPosition();
