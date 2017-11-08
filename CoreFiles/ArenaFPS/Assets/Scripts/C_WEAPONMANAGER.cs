@@ -102,7 +102,7 @@ public class C_WEAPONMANAGER : C_INPUT_MANAGER
 
     // Set Default weapon
     [SerializeField] WeaponList CurrentWeapon = WeaponList.Shotgun;
-    [SerializeField] WeaponList PrevWeapon;
+    [SerializeField] WeaponList PrevWeapon = WeaponList.None;
 
     // Weapons Parent Object
     Transform this_WeaponObject;
